@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "fusion-etl-pipeline"
+version = "0.1.0"
+description = ""
+authors = ["Wonjae Lee <wonjae.lee.2@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+msal = "^1.24.1"
+requests = "^2.31.0"
+playwright = "^1.39.0"
+pyodbc = "^5.0.1"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.1.3"
+black = "^23.10.1"
+pytest = "^7.4.3"
+jupyter = "^1.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
