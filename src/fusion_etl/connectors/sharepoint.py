@@ -15,13 +15,13 @@ def get_access_token(
     unhcr_secrets = secrets.read_secrets()["unhcr"]
 
     with sync_playwright() as playwright:
-        login(playwright, device_flow, unhcr_secrets)
+        _login(playwright, device_flow, unhcr_secrets)
 
     token = app.acquire_token_by_device_flow(device_flow)
     return token["access_token"]
 
 
-def login(playwright: Playwright, device_flow: dict, unhcr_secrets: dict) -> None:
+def _login(playwright: Playwright, device_flow: dict, unhcr_secrets: dict) -> None:
     browser = playwright.chromium.launch(headless=True)
     context = browser.new_context()
     page = context.new_page()
