@@ -3,7 +3,7 @@ import requests
 from msal import PublicClientApplication
 from playwright.sync_api import Playwright, sync_playwright
 
-from fusion_etl import secrets
+from fusion_etl import settings
 
 
 def get_access_token(
@@ -12,7 +12,7 @@ def get_access_token(
 ) -> str:
     app = PublicClientApplication(client_id)
     device_flow = app.initiate_device_flow(scope)
-    unhcr_secrets = secrets.read_secrets()["unhcr"]
+    unhcr_secrets = settings.read_secrets()["unhcr"]
 
     with sync_playwright() as playwright:
         _login(playwright, device_flow, unhcr_secrets)

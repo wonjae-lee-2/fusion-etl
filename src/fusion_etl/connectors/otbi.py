@@ -3,12 +3,12 @@ from urllib.parse import quote
 import pyotp
 from playwright.sync_api import Playwright, sync_playwright
 
-from fusion_etl import secrets
+from fusion_etl import settings
 
 
 def download_csv(path: str) -> str:
     encoded_path = quote(path, safe="")
-    unhcr_secrets = secrets.read_secrets()["unhcr"]
+    unhcr_secrets = settings.read_secrets()["unhcr"]
 
     with sync_playwright() as playwright:
         filename = _login_and_download(playwright, encoded_path, unhcr_secrets)
