@@ -22,7 +22,7 @@ def get_access_token(
 
 
 def login(playwright: Playwright, device_flow: dict, unhcr_secrets: dict) -> None:
-    browser = playwright.chromium.launch(headless=False)
+    browser = playwright.chromium.launch(headless=True)
     context = browser.new_context()
     page = context.new_page()
     page.goto(device_flow["verification_uri"])
