@@ -1,9 +1,8 @@
-from contextlib import contextmanager
 from urllib.parse import quote
 
-from playwright.sync_api import Page, sync_playwright
+from playwright.sync_api import Page
 
-from fusion_etl.utils import Secrets
+from fusion_etl.utils import Secrets, page_in_playwright
 
 
 class Connector:
@@ -22,7 +21,7 @@ class Connector:
         action = "Download"
         encoded_path = quote(report_path, safe="")
         go_url = self._get_go_url(encoded_path, action, download_format)
-        with self._page_in_playwright(headless_flag) as page:
+        with page_in_playwright(headless_flag) as page:
             page = self._authenticate_on_page(page, go_url)
             filename = self._download_from_page(page)
         return filename
@@ -35,22 +34,6 @@ class Connector:
     ) -> str:
         go_url = f"https://fa-esrv-saasfaprod1.fa.ocs.oraclecloud.com/analytics/saw.dll?Go&Path={encoded_path}&Action={action}&format={download_format}"
         return go_url
-
-    @contextmanager
-    def _page_in_playwright(
-        self,
-        headless_flag: bool,
-    ) -> Page:
-        playwright = sync_playwright().start()
-        browser = playwright.chromium.launch(headless=headless_flag)
-        context = browser.new_context()
-        page = context.new_page()
-        try:
-            yield page
-        finally:
-            context.close()
-            browser.close()
-            playwright.stop()
 
     def _authenticate_on_page(
         self,

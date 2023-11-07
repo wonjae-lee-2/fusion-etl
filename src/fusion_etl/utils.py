@@ -1,6 +1,8 @@
 import json
+from contextlib import contextmanager
 
 import pyotp
+from playwright.sync_api import Page, sync_playwright
 
 
 class Secrets:
@@ -17,3 +19,19 @@ class Secrets:
 
     def _get_totp_generator(self, secret_key: str) -> str:
         return pyotp.TOTP(secret_key)
+
+
+@contextmanager
+def page_in_playwright(
+    headless_flag: bool,
+) -> Page:
+    playwright = sync_playwright().start()
+    browser = playwright.chromium.launch(headless=headless_flag)
+    context = browser.new_context()
+    page = context.new_page()
+    try:
+        yield page
+    finally:
+        context.close()
+        browser.close()
+        playwright.stop()
