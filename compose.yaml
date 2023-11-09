@@ -1,0 +1,10 @@
+services:
+  dev:
+    image: fusion_etl/dev
+    build:
+      context: .
+      dockerfile: dev.Dockerfile
+    volumes:
+      - type: bind
+        source: ./
+        target: /fusion_etl
