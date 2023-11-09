@@ -1,45 +1,71 @@
 from urllib.parse import quote
 
-from playwright.sync_api import Page
+from playwright.sync_api import (
+    Browser,
+    BrowserContext,
+    Page,
+    Playwright,
+    sync_playwright,
+)
 
-from fusion_etl.utils import Secrets, page_in_playwright
+from fusion_etl.utils import Secrets
 
 
 class Connector:
-    def __init__(
+    def __init__(self, secrets_filename: str):
+        self.secrets = Secrets(secrets_filename)
+
+    def start_playwright(
         self,
-        secrets: Secrets,
-    ) -> None:
-        self.secrets = secrets
+        headless_flag: bool,
+    ) -> tuple[Playwright, Browser, BrowserContext, Page]:
+        playwright = sync_playwright().start()
+        browser = playwright.chromium.launch(headless=headless_flag)
+        context = browser.new_context()
+        page = context.new_page()
+        return (playwright, browser, context, page)
+
+    def stop_playwright(
+        self,
+        playwright: Playwright,
+        browser: Browser,
+        context: BrowserContext,
+    ):
+        context.close()
+        browser.close()
+        playwright.stop()
 
     def download(
         self,
+        page: Page,
         report_path: str,
+        action: str = "Download",
         download_format: str = "csv",
-        headless_flag: bool = True,
     ) -> str:
-        action = "Download"
         encoded_path = quote(report_path, safe="")
         go_url = self._get_go_url(encoded_path, action, download_format)
-        with page_in_playwright(headless_flag) as page:
-            page = self._authenticate_on_page(page, go_url)
-            filename = self._download_from_page(page)
-        return filename
+        page = self._authenticate(page, go_url)
+        download_filename = self._download(page)
+        return download_filename
 
     def _get_go_url(
         self,
         encoded_path: str,
         action: str,
         download_format: str,
+        base_url: str = "https://fa-esrv-saasfaprod1.fa.ocs.oraclecloud.com/analytics/saw.dll",
     ) -> str:
-        go_url = f"https://fa-esrv-saasfaprod1.fa.ocs.oraclecloud.com/analytics/saw.dll?Go&Path={encoded_path}&Action={action}&format={download_format}"
+        go_url = "&".join(
+            [
+                f"{base_url}?Go",
+                f"Path={encoded_path}",
+                f"Action={action}",
+                f"format={download_format}",
+            ]
+        )
         return go_url
 
-    def _authenticate_on_page(
-        self,
-        page: Page,
-        go_url: str,
-    ) -> Page:
+    def _authenticate(self, page: Page, go_url: str) -> Page:
         page.goto(go_url)
         page.get_by_role("button", name="Company Single Sign-On").click()
         page.get_by_label("username@unhcr.org").fill(self.secrets.unhcr["email"])
@@ -50,10 +76,7 @@ class Connector:
         page.get_by_role("button", name="Verify").click()
         return page
 
-    def _download_from_page(
-        self,
-        page: Page,
-    ) -> str:
+    def _download(self, page: Page) -> str:
         with page.expect_download(timeout=0) as download_info:
             page.get_by_role("button", name="Yes").click()
             download = download_info.value
