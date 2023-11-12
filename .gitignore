@@ -1,5 +1,5 @@
-# Secret file
-secrets.json
+# credentials file
+credentials.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
