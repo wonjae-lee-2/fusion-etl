@@ -1,0 +1,18 @@
+[
+    {
+        "source": "sharepoint",
+        "source_type": "file",
+        "source_path": "/BI Team/04. Processes/Fusion ETL/",
+        "source_name": "cost_center_mapping.csv",
+        "target_schema": "tst",
+        "target_table": "CC_Mapping"
+    },
+    {
+        "source": "sharepoint",
+        "source_type": "list",
+        "source_path": "",
+        "source_name": "Situation Allocation Ratios 2024",
+        "target_schema": "tst",
+        "target_table": "Situation_Ratios_2024"
+    }
+]
