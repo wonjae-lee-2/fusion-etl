@@ -54,4 +54,4 @@ def test_download(unhcr_credentials, totp_counter, etl_mappings, headless_flag):
     etl_mappings = connector.download()
     for etl_mapping in etl_mappings:
         assert os.path.exists(etl_mapping["filename"])
-        # os.remove(etl_mapping["filename"])
+        os.remove(etl_mapping["filename"])

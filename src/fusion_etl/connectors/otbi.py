@@ -12,14 +12,14 @@ class Connector:
         totp_counter: pyotp.TOTP,
         etl_mappings: list[dict[str, str]],
         headless_flag: bool,
-        base_url: str = "https://fa-esrv-saasfaprod1.fa.ocs.oraclecloud.com/analytics/saw.dll",
+        base_url: str = "https://fa-esrv-saasfaprod1.fa.ocs.oraclecloud.com",
     ):
         self.unhcr_credentials = unhcr_credentials
         self.totp_counter = totp_counter
         self.etl_mappings = etl_mappings
         self.headless_flag = headless_flag
         self.base_url = base_url
-        self.home_url = f"{self.base_url}?bieehome"
+        self.home_url = f"{self.base_url}/analytics/saw.dll?bieehome"
         self.action = None
         self.download_format = None
 
@@ -59,35 +59,52 @@ class Connector:
         return page
 
     def _download(self, authenticated_page: Page):
-        self._add_go_url_to_etl_mappings()
-        self._add_filename_to_etl_mappings()
         for etl_mapping in self.etl_mappings:
+            self._add_download_url_to_etl_mappings(etl_mapping)
+            self._add_filename_to_etl_mappings(etl_mapping)
             api_request_context = authenticated_page.request
-            r = api_request_context.get(etl_mapping["go_url"], timeout=600_000)
+            r = api_request_context.get(etl_mapping["download_url"], timeout=600_000)
             with open(etl_mapping["filename"], "wb") as f:
                 f.write(r.body())
+            authenticated_page.reload()
 
-    def _add_go_url_to_etl_mappings(self):
-        for etl_mapping in self.etl_mappings:
-            encoded_path = quote(
-                etl_mapping["source_path"] + etl_mapping["source_name"],
-                safe="",
-            )
-            etl_mapping["go_url"] = self._get_go_url(encoded_path)
+    def _add_download_url_to_etl_mappings(self, etl_mapping: dict[str, str]):
+        match etl_mapping["source_type"]:
+            case "analysis":
+                etl_mapping["download_url"] = self._get_download_url_for_analysis(
+                    etl_mapping
+                )
+            case "report":
+                etl_mapping["download_url"] = self._get_download_url_for_report(
+                    etl_mapping
+                )
 
-    def _get_go_url(self, encoded_path: str) -> str:
-        go_url = "&".join(
+    def _get_download_url_for_analysis(self, etl_mapping: dict[str, str]) -> str:
+        encoded_path = quote(
+            etl_mapping["source_path"] + etl_mapping["source_name"],
+            safe="",
+        )
+        download_url = "&".join(
             [
-                f"{self.base_url}?Go",
+                f"{self.base_url}/analytics/saw.dll?Go",
                 f"Path={encoded_path}",
                 f"Action={self.action}",
                 f"format={self.download_format}",
             ]
         )
-        return go_url
+        return download_url
 
-    def _add_filename_to_etl_mappings(self):
-        for etl_mapping in self.etl_mappings:
-            etl_mapping[
-                "filename"
-            ] = f"{etl_mapping['source_name']}.{self.download_format}"
+    def _get_download_url_for_report(self, etl_mapping: dict[str, str]) -> str:
+        encoded_path = (
+            etl_mapping["source_path"] + etl_mapping["source_name"]
+        ).replace(" ", "+")
+        download_url = (
+            f"{self.base_url}/xmlpserver"
+            + f"{encoded_path}.xdo"
+            + "?_xpt=1"
+            + f"&_xf={self.download_format}"
+        )
+        return download_url
+
+    def _add_filename_to_etl_mappings(self, etl_mapping: dict[str, str]):
+        etl_mapping["filename"] = f"{etl_mapping['source_name']}.{self.download_format}"

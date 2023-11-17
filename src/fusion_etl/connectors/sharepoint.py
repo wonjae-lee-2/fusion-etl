@@ -32,21 +32,15 @@ class Connector:
 
     def download(self):
         for etl_mapping in self.etl_mappings:
-            self._add_filename_to_etl_mapping(etl_mapping)
             self._get_access_token()
             match etl_mapping["source_type"]:
                 case "file":
+                    etl_mapping["filename"] = etl_mapping["source_name"]
                     self._download_file(etl_mapping)
                 case "list":
+                    etl_mapping["filename"] = f"{etl_mapping['source_name']}.csv"
                     self._download_list(etl_mapping)
         return self.etl_mappings
-
-    def _add_filename_to_etl_mapping(self, etl_mapping: dict[str, str]):
-        match etl_mapping["source_type"]:
-            case "file":
-                etl_mapping["filename"] = etl_mapping["source_name"]
-            case "list":
-                etl_mapping["filename"] = f"{etl_mapping['source_name']}.csv"
 
     def _get_access_token(self):
         if self.account is None:

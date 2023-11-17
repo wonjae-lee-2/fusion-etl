@@ -9,10 +9,10 @@
     },
     {
         "source": "otbi",
-        "source_type": "analysis",
-        "source_path": "/users/leew@unhcr.org/04 fusion etl/",
-        "source_name": "Test_PPM_Costs_2023",
+        "source_type": "report",
+        "source_path": "/~leew@unhcr.org/04 fusion etl/Tree/",
+        "source_name": "DFF",
         "target_schema": "tst",
-        "target_table": "PPM_Costs_2023"
+        "target_table": "DFF_Base"
     }
 ]
