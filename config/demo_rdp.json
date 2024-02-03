@@ -1,0 +1,10 @@
+[
+    {
+        "source": "rdp",
+        "source_type": "table",
+        "source_path": "srv",
+        "source_name": "regularPositionLine",
+        "target_schema": "tst",
+        "target_table": "regularPositionLine"
+    }
+]
