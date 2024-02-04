@@ -2,44 +2,59 @@ import struct
 import time
 
 import pyodbc
-import pyotp
 from msal import PublicClientApplication
 from playwright.sync_api import Page, Playwright, sync_playwright
+
+from fusion_etl.utils import Credentials
 
 
 class Connector:
     def __init__(
         self,
-        unhcr_credentials: dict[str, str],
-        totp_counter: pyotp.TOTP,
-        etl_mappings: list[dict[str, str]],
-        headless_flag: bool,
+        credentials: Credentials,
+        headless_flag: bool = True,
         client_id: str = "04b07795-8ddb-461a-bbee-02f9e1bf7b46",
         scope: list[str] = ["https://database.windows.net/.default"],
         driver: str = "ODBC Driver 18 for SQL Server",
         server: str = "unhcr-rdp-prd-sql-server.database.windows.net",
         database: str = "unhcr-rdp-prd-sql-db",
+        conn_attribute: int = 1256,  # SQL_COPT_SS_ACCESS_TOKEN
     ):
-        self.unhcr_credentials = unhcr_credentials
-        self.totp_counter = totp_counter
-        self.etl_mappings = etl_mappings
+        self.unhcr_credentials = credentials.unhcr
+        self.totp_counter = credentials.totp_counter
         self.headless_flag = headless_flag
         self.app = PublicClientApplication(client_id)
+        self.account = None
+        self.access_token = None
         self.scope = scope
         self.driver = driver
         self.server = server
         self.database = database
-        self.account = None
-        self.access_token = None
+        self.conn = None
+        self.conn_attribute = conn_attribute
 
-    def download(self):
-        for etl_mapping in self.etl_mappings:
-            self._get_access_token()
-            match etl_mapping["source_type"]:
-                case "table":
-                    etl_mapping["filename"] = f"{etl_mapping['source_name']}.csv"
-                    self._query_table(etl_mapping)
-        return self.etl_mappings
+    def open_conn(self):
+        self._get_access_token()
+        connstring = f"""
+            Driver={self.driver};
+            Server={self.server};
+            Database={self.database};
+        """
+        sql_server_token = self._get_sql_server_token()
+        self.conn = pyodbc.connect(
+            connstring,
+            attrs_before={self.conn_attribute: sql_server_token},
+        )
+
+    def query(
+        self, etl_mapping: dict[str, str]
+    ) -> tuple[list[str], list[tuple[any, ...]]]:
+        if etl_mapping["source_type"] == "table":
+            (column_names, rows) = self._query_table(etl_mapping)
+        return (column_names, rows)
+
+    def close_conn(self):
+        self.conn.close()
 
     def _get_access_token(self):
         if self.account is None:
@@ -72,9 +87,7 @@ class Connector:
         page.goto(flow["verification_uri"])
         page.get_by_placeholder("Code").fill(flow["user_code"])
         page.get_by_role("button", name="Next").click()
-        page.get_by_label("Enter your email, phone, or Skype.").fill(
-            self.unhcr_credentials["email"]
-        )
+        page.get_by_placeholder("Email or phone").fill(self.unhcr_credentials["email"])
         page.get_by_role("button", name="Next").click()
         page.get_by_placeholder("Password").fill(self.unhcr_credentials["password"])
         page.get_by_placeholder("Password").press("Enter")
@@ -86,25 +99,28 @@ class Connector:
         response = self.app.acquire_token_silent(self.scope, self.account)
         self.access_token = response["access_token"]
 
-    def _query_table(self, etl_mapping: dict[str, str]):
-        tokenstruct = self._get_tokenstruct(self.access_token)
-        connstring = f"""
-            Driver={self.driver};
-            Server={self.server};
-            Database={self.database};
-        """
-        conn = pyodbc.connect(connstring, attrs_before={1256: tokenstruct})
-        cursor = conn.cursor()
-        cursor.execute(
-            f"SELECT * FROM {etl_mapping['source_path']}.{etl_mapping['source_name']}"
-        )
-        rows = cursor.fetchall()
-        return rows
+    def _get_sql_server_token(self) -> bytes:
+        expanded_token = b""
+        for i in bytes(self.access_token, "UTF-8"):
+            expanded_token += bytes([i])
+            expanded_token += bytes(1)
+        sql_server_token = struct.pack("=i", len(expanded_token)) + expanded_token
+        return sql_server_token
 
-    def _get_tokenstruct(self, access_token: str):
-        exptoken = b""
-        for i in bytes(access_token, "UTF-8"):
-            exptoken += bytes({i})
-            exptoken += bytes(1)
-        tokenstruct = struct.pack("=i", len(exptoken)) + exptoken
-        return tokenstruct
+    def _query_table(
+        self, etl_mapping: dict[str, str]
+    ) -> tuple[list[str], list[tuple[any, ...]]]:
+        with self.conn.cursor() as cursor:
+            cursor.execute(
+                f"SELECT * FROM {etl_mapping['source_path']}.{etl_mapping['source_name']}"
+            )
+            column_names = self._get_column_names(cursor)
+            rows = cursor.fetchall()
+        return (column_names, rows)
+
+    def _get_column_names(self, cursor: pyodbc.Cursor) -> list[str]:
+        column_names = []
+        columns = cursor.description
+        for col in columns:
+            column_names.append(col[0])
+        return column_names
