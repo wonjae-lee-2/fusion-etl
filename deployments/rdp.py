@@ -5,9 +5,9 @@ from fusion_etl import utils
 
 
 @flow
-def pipeline(
-    credentials_path: str,
-    etl_mappings_path: str,
+def rdp_all(
+    credentials_path: str = "config/credentials.json",
+    etl_mappings_path: str = "config/rdp.json",
     headless_flag: bool = True,
 ):
     credentials = utils.Credentials(credentials_path)
@@ -33,9 +33,7 @@ def copy_table(
 
 
 if __name__ == "__main__":
-    credentials_path = "config/credentials.json"
-    etl_mappings_path = "config/rdp.json"
-    pipeline(credentials_path, etl_mappings_path).serve(
+    rdp_all.serve(
         name="rdp",
         cron="0 3 * * *",
     )
