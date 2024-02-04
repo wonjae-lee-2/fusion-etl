@@ -35,4 +35,7 @@ def copy_table(
 if __name__ == "__main__":
     credentials_path = "config/credentials.json"
     etl_mappings_path = "config/rdp.json"
-    pipeline(credentials_path, etl_mappings_path)
+    pipeline(credentials_path, etl_mappings_path).serve(
+        name="rdp",
+        cron="0 3 * * *",
+    )
