@@ -7,7 +7,7 @@ from fusion_etl import utils
 @flow
 def rdp_all(
     credentials_path: str = "config/credentials.json",
-    etl_mappings_path: str = "config/rdp.json",
+    etl_mappings_path: str = "config/rdp_all.json",
     headless_flag: bool = True,
 ):
     credentials = utils.Credentials(credentials_path)
