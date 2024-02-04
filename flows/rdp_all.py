@@ -33,7 +33,4 @@ def copy_table(
 
 
 if __name__ == "__main__":
-    rdp_all.serve(
-        name="rdp_all",
-        cron="0 3 * * *",
-    )
+    rdp_all()
