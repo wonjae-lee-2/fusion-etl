@@ -1,8 +1,22 @@
 import polars as pl
+from fusion_etl import utils
+from fusion_etl.connectors import erp, fusion
+from prefect import flow, task
 
-from fusion_etl.utils import BasePipeline
 
+@flow
+def otbi_ppm(
+    credentials_path: str = "config/credentials.json",
+    etl_mappings_path: str = "config/otbi_ppm.json",
+    headless_flag: bool = True,
+):
+    credentials = utils.Credentials(credentials_path)
+    etl_mappings = utils.read_etl_mappings(etl_mappings_path)
+    otbi_connector = erp.Connector(credentials, headless_flag=headless_flag)
+    otbi_connector.download(etl_mappings)
+    pass
 
+"""
 class Pipeline(BasePipeline):
     def __init__(
         self,
@@ -39,14 +53,7 @@ class Pipeline(BasePipeline):
             pl.col("Cost").cast(pl.Float64)
         )
         return df
-
+"""
 
 if __name__ == "__main__":
-    etl_mappings_path = "config/demo_otbi.json"
-    unhcr_network_flag = False
-
-    pipeline = Pipeline(
-        etl_mappings_path,
-        unhcr_network_flag,
-    )
-    pipeline.run()
+    otbi_ppm()

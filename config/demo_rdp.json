@@ -1,0 +1,18 @@
+[
+    {
+        "source": "rdp",
+        "source_type": "table",
+        "source_path": "srv",
+        "source_name": "regularPositionLine",
+        "target_schema": "tst",
+        "target_table": "regularPositionLine"
+    },
+    {
+        "source": "rdp",
+        "source_type": "table",
+        "source_path": "srv",
+        "source_name": "ApportionedBudgetLine",
+        "target_schema": "tst",
+        "target_table": "ApportionedBudgetLine"
+    }
+]

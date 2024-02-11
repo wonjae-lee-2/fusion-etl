@@ -2,7 +2,7 @@ import json
 import os
 
 import pytest
-from fusion_etl.connectors import otbi
+from fusion_etl.connectors import erp
 from fusion_etl.utils import Credentials
 
 
@@ -45,7 +45,7 @@ def headless_flag():
 
 
 def test_download(unhcr_credentials, totp_counter, etl_mappings, headless_flag):
-    connector = otbi.Connector(
+    connector = erp.Connector(
         unhcr_credentials,
         totp_counter,
         etl_mappings,
