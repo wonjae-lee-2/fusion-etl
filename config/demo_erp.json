@@ -1,6 +1,6 @@
 [
     {
-        "source": "otbi",
+        "source": "erp",
         "source_type": "analysis",
         "source_path": "/users/leew@unhcr.org/02 fusion etl/",
         "source_name": "Test_BC_Balances_2023",
@@ -8,19 +8,11 @@
         "target_table": "BC_Balances_2023"
     },
     {
-        "source": "otbi",
+        "source": "erp",
         "source_type": "report",
         "source_path": "/~leew@unhcr.org/03 PPM/",
         "source_name": "PPM Commitment",
         "target_schema": "tst",
         "target_table": "PPM_Commitment"
-    },
-    {
-        "source": "otbi",
-        "source_type": "report",
-        "source_path": "/~leew@unhcr.org/03 PPM/",
-        "source_name": "PPM Expenditure",
-        "target_schema": "tst",
-        "target_table": "PPM_Expenditure"
     }
 ]

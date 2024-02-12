@@ -1,3 +1,5 @@
+import os
+
 import polars as pl
 import pyodbc
 
@@ -10,13 +12,17 @@ class Connector:
         credentials: Credentials,
         driver: str = "ODBC Driver 18 for SQL Server",
     ):
+        print("initializing Fusion DB Connector")
         self.driver = driver
         self.fusion_credentials = credentials.fusion
         self.conn = None
+        print("...done")
 
     def open_conn(self):
+        print("opening connection")
         connstring = self._get_connstring()
         self.conn = pyodbc.connect(connstring)
+        print("...done")
 
     def insert_rows(
         self,
@@ -26,6 +32,7 @@ class Connector:
     ):
         target_schema = etl_mapping["target_schema"]
         target_table = etl_mapping["target_table"]
+        print(f"inserting into {target_schema}.{target_table}")
         column_names_str = self._join_column_names(column_names)
         with self.conn.cursor() as cursor:
             cursor.execute(f"TRUNCATE TABLE [{target_schema}].[{target_table}]")
@@ -35,25 +42,32 @@ class Connector:
                 rows,
             )
             cursor.commit()
+        print("...done")
 
     def insert_df(
         self,
+        etl_mapping: dict[str, str],
         df: pl.DataFrame,
-        schema_name: str,
-        table_name: str,
     ):
+        target_schema = etl_mapping["target_schema"]
+        target_table = etl_mapping["target_table"]
+        print(f"inserting into {target_schema}.{target_table}")
         (column_names, values) = self._convert_df(df)
         with self.conn.cursor() as cursor:
-            cursor.execute(f"TRUNCATE TABLE [{schema_name}].[{table_name}]")
+            cursor.execute(f"TRUNCATE TABLE [{target_schema}].[{target_table}]")
             cursor.fast_executemany = True
             cursor.executemany(
-                f"INSERT INTO [{schema_name}].[{table_name}] ({column_names}) VALUES ({', '.join(['?' for _ in values[0]])})",
+                f"INSERT INTO [{target_schema}].[{target_table}] ({column_names}) VALUES ({', '.join(['?' for _ in values[0]])})",
                 values,
             )
             cursor.commit()
+        os.remove(etl_mapping["filename"])
+        print("...done")
 
     def close_conn(self):
+        print("closing connection")
         self.conn.close()
+        print("...done")
 
     def _get_connstring(self) -> str:
         connstring = ";".join(
