@@ -20,6 +20,7 @@ class Connector:
         database: str = "unhcr-rdp-prd-sql-db",
         conn_attribute: int = 1256,  # SQL_COPT_SS_ACCESS_TOKEN
     ):
+        print("initializing RDP Connector")
         self.unhcr_credentials = credentials.unhcr
         self.totp_counter = credentials.totp_counter
         self.headless_flag = headless_flag
@@ -32,8 +33,10 @@ class Connector:
         self.database = database
         self.conn = None
         self.conn_attribute = conn_attribute
+        print("...done")
 
     def open_conn(self):
+        print("opening connection")
         self._get_access_token()
         connstring = f"""
             Driver={self.driver};
@@ -45,16 +48,21 @@ class Connector:
             connstring,
             attrs_before={self.conn_attribute: sql_server_token},
         )
+        print("...done")
 
     def query(
         self, etl_mapping: dict[str, str]
     ) -> tuple[list[str], list[tuple[any, ...]]]:
+        print(f"querying {etl_mapping['source_path']}.{etl_mapping['source_name']}")
         if etl_mapping["source_type"] == "table":
             (column_names, rows) = self._query_table(etl_mapping)
+        print("...done")
         return (column_names, rows)
 
     def close_conn(self):
+        print("closing connection")
         self.conn.close()
+        print("...done")
 
     def _get_access_token(self):
         if self.account is None:

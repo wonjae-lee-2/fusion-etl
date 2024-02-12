@@ -10,26 +10,27 @@ def demo_rdp(
     etl_mappings_path: str = "config/demo_rdp.json",
     headless_flag: bool = True,
 ):
+    # _ = input("Connect to VPN and press enter\n")
     credentials = utils.Credentials(credentials_path)
     etl_mappings = utils.read_etl_mappings(etl_mappings_path)
     rdp_connector = rdp.Connector(credentials, headless_flag=headless_flag)
     rdp_connector.open_conn()
     fusion_connector = fusion.Connector(credentials)
     fusion_connector.open_conn()
-    for etl_mapping in etl_mappings:
-        copy_table(rdp_connector, fusion_connector, etl_mapping)
+    copy_rdp(rdp_connector, fusion_connector, etl_mappings)
     rdp_connector.close_conn()
     fusion_connector.close_conn()
 
 
 @task
-def copy_table(
+def copy_rdp(
     rdp_connector: rdp.Connector,
     fusion_connector: fusion.Connector,
-    etl_mapping: dict[str, str],
+    etl_mappings: list[dict[str, str]],
 ):
-    (column_names, rows) = rdp_connector.query(etl_mapping)
-    fusion_connector.insert_rows(etl_mapping, column_names, rows)
+    for etl_mapping in etl_mappings:
+        (column_names, rows) = rdp_connector.query(etl_mapping)
+        fusion_connector.insert_rows(etl_mapping, column_names, rows)
 
 
 if __name__ == "__main__":
