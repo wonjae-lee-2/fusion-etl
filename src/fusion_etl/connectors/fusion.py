@@ -19,7 +19,7 @@ class Connector:
         print("...done")
 
     def open_conn(self):
-        print("opening connection")
+        print("opening connection to Fusion DB")
         connstring = self._get_connstring()
         self.conn = pyodbc.connect(connstring)
         print("...done")
@@ -65,7 +65,7 @@ class Connector:
         print("...done")
 
     def close_conn(self):
-        print("closing connection")
+        print("closing connection to Fusion DB")
         self.conn.close()
         print("...done")
 

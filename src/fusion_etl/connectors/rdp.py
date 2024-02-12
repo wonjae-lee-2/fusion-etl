@@ -36,7 +36,7 @@ class Connector:
         print("...done")
 
     def open_conn(self):
-        print("opening connection")
+        print("opening connection to RDP")
         self._get_access_token()
         connstring = f"""
             Driver={self.driver};
@@ -60,7 +60,7 @@ class Connector:
         return (column_names, rows)
 
     def close_conn(self):
-        print("closing connection")
+        print("closing connection to RDP")
         self.conn.close()
         print("...done")
 

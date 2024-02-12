@@ -23,7 +23,7 @@ class Connector:
         print("...done")
 
     def start_playwright(self):
-        print("starting playwright")
+        print("starting playwright for Cloud ERP")
         self.playwright = sync_playwright().start()
         self.browser = self.playwright.chromium.launch(headless=self.headless_flag)
         new_page = self.browser.new_page()
@@ -42,7 +42,7 @@ class Connector:
         print("...done")
 
     def stop_playwright(self):
-        print("stopping playwright")
+        print("stopping playwright for Cloud ERP")
         self.browser.close()
         self.playwright.stop()
         print("...done")
