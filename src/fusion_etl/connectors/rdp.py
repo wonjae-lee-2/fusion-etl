@@ -32,6 +32,7 @@ class Connector:
         self.server = server
         self.database = database
         self.conn = None
+        self.cursor = None
         self.conn_attribute = conn_attribute
         print("...done")
 
@@ -48,6 +49,7 @@ class Connector:
             connstring,
             attrs_before={self.conn_attribute: sql_server_token},
         )
+        self.cursor = self.conn.cursor()
         print("...done")
 
     def query(
@@ -61,6 +63,7 @@ class Connector:
 
     def close_conn(self):
         print("closing connection to RDP")
+        self.cursor.close()
         self.conn.close()
         print("...done")
 
@@ -118,17 +121,16 @@ class Connector:
     def _query_table(
         self, etl_mapping: dict[str, str]
     ) -> tuple[list[str], list[tuple[any, ...]]]:
-        with self.conn.cursor() as cursor:
-            cursor.execute(
-                f"SELECT * FROM {etl_mapping['source_path']}.{etl_mapping['source_name']}"
-            )
-            column_names = self._get_column_names(cursor)
-            rows = cursor.fetchall()
+        self.cursor.execute(
+            f"SELECT * FROM {etl_mapping['source_path']}.{etl_mapping['source_name']}"
+        )
+        column_names = self._get_column_names()
+        rows = self.cursor.fetchall()
         return (column_names, rows)
 
-    def _get_column_names(self, cursor: pyodbc.Cursor) -> list[str]:
+    def _get_column_names(self) -> list[str]:
         column_names = []
-        columns = cursor.description
+        columns = self.cursor.description
         for col in columns:
             column_names.append(col[0])
         return column_names

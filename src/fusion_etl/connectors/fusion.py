@@ -16,12 +16,15 @@ class Connector:
         self.driver = driver
         self.fusion_credentials = credentials.fusion
         self.conn = None
+        self.cursor = None
         print("...done")
 
     def open_conn(self):
         print("opening connection to Fusion DB")
         connstring = self._get_connstring()
         self.conn = pyodbc.connect(connstring)
+        self.cursor = self.conn.cursor()
+        self.cursor.fast_executemany = True
         print("...done")
 
     def insert_rows(
@@ -34,14 +37,12 @@ class Connector:
         target_table = etl_mapping["target_table"]
         print(f"inserting into {target_schema}.{target_table}")
         column_names_str = self._join_column_names(column_names)
-        with self.conn.cursor() as cursor:
-            cursor.execute(f"TRUNCATE TABLE [{target_schema}].[{target_table}]")
-            cursor.fast_executemany = True
-            cursor.executemany(
-                f"INSERT INTO [{target_schema}].[{target_table}] ({column_names_str}) VALUES ({', '.join(['?' for _ in rows[0]])})",
-                rows,
-            )
-            cursor.commit()
+        self.cursor.execute(f"TRUNCATE TABLE [{target_schema}].[{target_table}]")
+        self.cursor.executemany(
+            f"INSERT INTO [{target_schema}].[{target_table}] ({column_names_str}) VALUES ({', '.join(['?' for _ in rows[0]])})",
+            rows,
+        )
+        self.cursor.commit()
         print("...done")
 
     def insert_df(
@@ -53,19 +54,18 @@ class Connector:
         target_table = etl_mapping["target_table"]
         print(f"inserting into {target_schema}.{target_table}")
         (column_names, values) = self._convert_df(df)
-        with self.conn.cursor() as cursor:
-            cursor.execute(f"TRUNCATE TABLE [{target_schema}].[{target_table}]")
-            cursor.fast_executemany = True
-            cursor.executemany(
-                f"INSERT INTO [{target_schema}].[{target_table}] ({column_names}) VALUES ({', '.join(['?' for _ in values[0]])})",
-                values,
-            )
-            cursor.commit()
+        self.cursor.execute(f"TRUNCATE TABLE [{target_schema}].[{target_table}]")
+        self.cursor.executemany(
+            f"INSERT INTO [{target_schema}].[{target_table}] ({column_names}) VALUES ({', '.join(['?' for _ in values[0]])})",
+            values,
+        )
+        self.cursor.commit()
         os.remove(etl_mapping["filename"])
         print("...done")
 
     def close_conn(self):
         print("closing connection to Fusion DB")
+        self.cursor.close()
         self.conn.close()
         print("...done")
 
