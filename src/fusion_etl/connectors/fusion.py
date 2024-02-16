@@ -33,7 +33,7 @@ class Connector:
         column_names: list[str],
         rows: list[tuple[any, ...]],
     ):
-        if len(rows) == 0:
+        if not rows:
             return
         target_schema = etl_mapping["target_schema"]
         target_table = etl_mapping["target_table"]
