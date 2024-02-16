@@ -4,7 +4,7 @@ from fusion_etl.connectors import erp, fusion
 from prefect import flow, task
 
 
-@flow
+@flow(log_prints=True)
 def demo_erp(
     credentials_path: str = "config/credentials.json",
     etl_mappings_path: str = "config/demo_erp.json",

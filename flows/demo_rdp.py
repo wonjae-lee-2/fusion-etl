@@ -4,7 +4,7 @@ from fusion_etl.connectors import fusion, rdp
 from fusion_etl import utils
 
 
-@flow
+@flow(log_prints=True)
 def demo_rdp(
     credentials_path: str = "config/credentials.json",
     etl_mappings_path: str = "config/demo_rdp.json",
