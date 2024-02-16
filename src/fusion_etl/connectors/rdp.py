@@ -122,7 +122,7 @@ class Connector:
         self, etl_mapping: dict[str, str]
     ) -> tuple[list[str], list[tuple[any, ...]]]:
         self.cursor.execute(
-            f"SELECT * FROM {etl_mapping['source_path']}.{etl_mapping['source_name']}"
+            f"SELECT * FROM [{etl_mapping['source_path']}].[{etl_mapping['source_name']}]"
         )
         column_names = self._get_column_names()
         rows = self.cursor.fetchall()
