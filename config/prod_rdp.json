@@ -19,6 +19,14 @@
         "source": "rdp",
         "source_type": "table",
         "source_path": "srv",
+        "source_name": "UDGPIndicatorPopulationType",
+        "target_schema": "srv",
+        "target_table": "UDGPIndicatorPopulationType"
+    },
+    {
+        "source": "rdp",
+        "source_type": "table",
+        "source_path": "srv",
         "source_name": "MoVUDGPIndicatorPopulationType",
         "target_schema": "srv",
         "target_table": "MoVUDGPIndicatorPopulationType"
@@ -998,14 +1006,6 @@
         "source_name": "UDGPIndicatorConfiguration",
         "target_schema": "srv",
         "target_table": "UDGPIndicatorConfiguration"
-    },
-    {
-        "source": "rdp",
-        "source_type": "table",
-        "source_path": "srv",
-        "source_name": "UDGPIndicatorPopulationType",
-        "target_schema": "srv",
-        "target_table": "UDGPIndicatorPopulationType"
     },
     {
         "source": "rdp",

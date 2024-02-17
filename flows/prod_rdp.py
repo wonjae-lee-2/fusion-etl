@@ -15,9 +15,9 @@ def prod_rdp(
     credentials = utils.Credentials(credentials_path)
     etl_mappings = utils.read_etl_mappings(etl_mappings_path)
     rdp_connector = rdp.Connector(credentials, headless_flag=headless_flag)
-    rdp_connector.open_conn()
+    access_token = rdp_connector.open_conn()
     fusion_connector = fusion.Connector(credentials)
-    fusion_connector.open_conn()
+    fusion_connector.open_conn(access_token)
     copy_rdp(rdp_connector, fusion_connector, etl_mappings)
     rdp_connector.close_conn()
     fusion_connector.close_conn()
@@ -36,6 +36,9 @@ def copy_rdp(
             fusion_connector.insert_df(etl_mapping, df)
         elif etl_mapping["source_name"] == "UDGPIndicatorPopulationType":
             df = _transform_UDGPIndicatorPopulationType(column_names, rows)
+            fusion_connector.insert_df(etl_mapping, df)
+        elif etl_mapping["source_name"] == "MoVUDGPIndicatorPopulationType":
+            df = _transform_MoVUDGPIndicatorPopulationType(column_names, rows)
             fusion_connector.insert_df(etl_mapping, df)
         else:
             fusion_connector.insert_rows(etl_mapping, column_names, rows)
@@ -65,6 +68,23 @@ def _transform_UDGPIndicatorPopulationType(
         .with_columns(pl.col("ImpactStatement").cast(pl.Utf8).fill_null(""))
         .with_columns(pl.col("OutcomeStatement").cast(pl.Utf8).fill_null(""))
         .with_columns(pl.col("OutputStatement").cast(pl.Utf8).fill_null(""))
+    )
+    return df
+
+
+def _transform_MoVUDGPIndicatorPopulationType(
+    column_names: list[str],
+    rows: list[tuple[any, ...]],
+) -> pl.DataFrame:
+    data = [dict(zip(column_names, row)) for row in rows]
+    df = (
+        pl.DataFrame(data=data, infer_schema_length=None)
+        .with_columns(pl.col("ImpactStatement").cast(pl.Utf8).fill_null(""))
+        .with_columns(pl.col("OutcomeStatement").cast(pl.Utf8).fill_null(""))
+        .with_columns(pl.col("AdditionalDataSources").cast(pl.Utf8).fill_null(""))
+        .with_columns(pl.col("DataSourcesComment").cast(pl.Utf8).fill_null(""))
+        .with_columns(pl.col("Comment").cast(pl.Utf8).fill_null(""))
+        .with_columns(pl.col("ResponsibilityExternal").cast(pl.Utf8).fill_null(""))
     )
     return df
 

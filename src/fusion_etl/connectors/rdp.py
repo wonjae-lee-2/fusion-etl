@@ -21,12 +21,14 @@ class Connector:
         conn_attribute: int = 1256,  # SQL_COPT_SS_ACCESS_TOKEN
     ):
         print("initializing RDP Connector")
-        self.unhcr_credentials = credentials.unhcr
+        self.email = credentials.email
+        self.password = credentials.password
         self.totp_counter = credentials.totp_counter
         self.headless_flag = headless_flag
         self.app = PublicClientApplication(client_id)
         self.account = None
         self.access_token = None
+        self.refresh_token = None
         self.scope = scope
         self.driver = driver
         self.server = server
@@ -34,9 +36,9 @@ class Connector:
         self.conn = None
         self.cursor = None
         self.conn_attribute = conn_attribute
-        print("...done")
+        print("... done")
 
-    def open_conn(self):
+    def open_conn(self) -> str:
         print("opening connection to RDP")
         self._get_access_token()
         connstring = f"""
@@ -50,7 +52,8 @@ class Connector:
             attrs_before={self.conn_attribute: sql_server_token},
         )
         self.cursor = self.conn.cursor()
-        print("...done")
+        print("... done")
+        return self.refresh_token
 
     def query(
         self, etl_mapping: dict[str, str]
@@ -61,14 +64,14 @@ class Connector:
             (column_names, rows) = self._query_table(etl_mapping)
         end_time = time.time()
         duration = round(end_time - start_time)
-        print(f"...done in {duration}s")
+        print(f"... done in {duration}s")
         return (column_names, rows)
 
     def close_conn(self):
         print("closing connection to RDP")
         self.cursor.close()
         self.conn.close()
-        print("...done")
+        print("... done")
 
     def _get_access_token(self):
         if self.account is None:
@@ -83,6 +86,7 @@ class Connector:
         time.sleep(5)
         response = self.app.acquire_token_by_device_flow(flow)
         self.access_token = response["access_token"]
+        self.refresh_token = response["refresh_token"]
         self.account = self.app.get_accounts()[0]
 
     def _authenticate_with_playwright(
@@ -91,9 +95,7 @@ class Connector:
         browser = playwright.chromium.launch(headless=self.headless_flag)
         context = browser.new_context()
         page = context.new_page()
-
         self._authenticate(page, flow)
-
         context.close()
         browser.close()
 
@@ -101,9 +103,9 @@ class Connector:
         page.goto(flow["verification_uri"])
         page.get_by_placeholder("Code").fill(flow["user_code"])
         page.get_by_role("button", name="Next").click()
-        page.get_by_placeholder("Email or phone").fill(self.unhcr_credentials["email"])
+        page.get_by_placeholder("Email or phone").fill(self.email)
         page.get_by_role("button", name="Next").click()
-        page.get_by_placeholder("Password").fill(self.unhcr_credentials["password"])
+        page.get_by_placeholder("Password").fill(self.password)
         page.get_by_placeholder("Password").press("Enter")
         page.get_by_placeholder("Code").fill(self.totp_counter.now())
         page.get_by_role("button", name="Verify").click()
