@@ -55,10 +55,13 @@ class Connector:
     def query(
         self, etl_mapping: dict[str, str]
     ) -> tuple[list[str], list[tuple[any, ...]]]:
+        start_time = time.time()
         print(f"querying {etl_mapping['source_path']}.{etl_mapping['source_name']}")
         if etl_mapping["source_type"] == "table":
             (column_names, rows) = self._query_table(etl_mapping)
-        print("...done")
+        end_time = time.time()
+        duration = round(end_time - start_time)
+        print(f"...done in {duration}s")
         return (column_names, rows)
 
     def close_conn(self):

@@ -3,6 +3,30 @@
         "source": "rdp",
         "source_type": "table",
         "source_path": "srv",
+        "source_name": "MappingCostCenter",
+        "target_schema": "srv",
+        "target_table": "MappingCostCenter"
+    },
+    {
+        "source": "rdp",
+        "source_type": "table",
+        "source_path": "srv",
+        "source_name": "UDGPIndicatorAGDPopulationType",
+        "target_schema": "srv",
+        "target_table": "UDGPIndicatorAGDPopulationType"
+    },
+    {
+        "source": "rdp",
+        "source_type": "table",
+        "source_path": "srv",
+        "source_name": "MoVUDGPIndicatorPopulationType",
+        "target_schema": "srv",
+        "target_table": "MoVUDGPIndicatorPopulationType"
+    },
+    {
+        "source": "rdp",
+        "source_type": "table",
+        "source_path": "srv",
         "source_name": "_ExecutionLog",
         "target_schema": "srv",
         "target_table": "_ExecutionLog"
@@ -451,14 +475,6 @@
         "source": "rdp",
         "source_type": "table",
         "source_path": "srv",
-        "source_name": "MappingCostCenter",
-        "target_schema": "srv",
-        "target_table": "MappingCostCenter"
-    },
-    {
-        "source": "rdp",
-        "source_type": "table",
-        "source_path": "srv",
         "source_name": "MEActivityEstimatedCost",
         "target_schema": "srv",
         "target_table": "MEActivityEstimatedCost"
@@ -478,14 +494,6 @@
         "source_name": "MoVUDGPIndicatorConfiguration",
         "target_schema": "srv",
         "target_table": "MoVUDGPIndicatorConfiguration"
-    },
-    {
-        "source": "rdp",
-        "source_type": "table",
-        "source_path": "srv",
-        "source_name": "MoVUDGPIndicatorPopulationType",
-        "target_schema": "srv",
-        "target_table": "MoVUDGPIndicatorPopulationType"
     },
     {
         "source": "rdp",
@@ -982,14 +990,6 @@
         "source_name": "UDGPIndicatorAGDActual",
         "target_schema": "srv",
         "target_table": "UDGPIndicatorAGDActual"
-    },
-    {
-        "source": "rdp",
-        "source_type": "table",
-        "source_path": "srv",
-        "source_name": "UDGPIndicatorAGDPopulationType",
-        "target_schema": "srv",
-        "target_table": "UDGPIndicatorAGDPopulationType"
     },
     {
         "source": "rdp",

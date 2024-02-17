@@ -1,7 +1,8 @@
+import polars as pl
 from prefect import flow, task
 
-from fusion_etl.connectors import fusion, rdp
 from fusion_etl import utils
+from fusion_etl.connectors import fusion, rdp
 
 
 @flow(log_prints=True)
@@ -30,7 +31,42 @@ def copy_rdp(
 ):
     for etl_mapping in etl_mappings:
         (column_names, rows) = rdp_connector.query(etl_mapping)
-        fusion_connector.insert_rows(etl_mapping, column_names, rows)
+        if etl_mapping["source_name"] == "UDGPIndicatorAGDPopulationType":
+            df = _transform_UDGPIndicatorAGDPopulationType(column_names, rows)
+            fusion_connector.insert_df(etl_mapping, df)
+        elif etl_mapping["source_name"] == "UDGPIndicatorPopulationType":
+            df = _transform_UDGPIndicatorPopulationType(column_names, rows)
+            fusion_connector.insert_df(etl_mapping, df)
+        else:
+            fusion_connector.insert_rows(etl_mapping, column_names, rows)
+
+
+def _transform_UDGPIndicatorAGDPopulationType(
+    column_names: list[str],
+    rows: list[tuple[any, ...]],
+) -> pl.DataFrame:
+    data = [dict(zip(column_names, row)) for row in rows]
+    df = (
+        pl.DataFrame(data=data, infer_schema_length=None)
+        .with_columns(pl.col("ImpactStatement").cast(pl.Utf8).fill_null(""))
+        .with_columns(pl.col("OutcomeStatement").cast(pl.Utf8).fill_null(""))
+        .with_columns(pl.col("OutputStatement").cast(pl.Utf8).fill_null(""))
+    )
+    return df
+
+
+def _transform_UDGPIndicatorPopulationType(
+    column_names: list[str],
+    rows: list[tuple[any, ...]],
+) -> pl.DataFrame:
+    data = [dict(zip(column_names, row)) for row in rows]
+    df = (
+        pl.DataFrame(data=data, infer_schema_length=None)
+        .with_columns(pl.col("ImpactStatement").cast(pl.Utf8).fill_null(""))
+        .with_columns(pl.col("OutcomeStatement").cast(pl.Utf8).fill_null(""))
+        .with_columns(pl.col("OutputStatement").cast(pl.Utf8).fill_null(""))
+    )
+    return df
 
 
 if __name__ == "__main__":

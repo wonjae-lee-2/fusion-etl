@@ -1,4 +1,5 @@
 import os
+import time
 
 import polars as pl
 import pyodbc
@@ -33,6 +34,7 @@ class Connector:
         column_names: list[str],
         rows: list[tuple[any, ...]],
     ):
+        start_time = time.time()
         if not rows:
             return
         target_schema = etl_mapping["target_schema"]
@@ -45,13 +47,18 @@ class Connector:
             rows,
         )
         self.cursor.commit()
-        print("...done")
+        end_time = time.time()
+        duration = round(end_time - start_time)
+        print(f"...done in {duration}s")
 
     def insert_df(
         self,
         etl_mapping: dict[str, str],
         df: pl.DataFrame,
     ):
+        start_time = time.time()
+        if df.is_empty():
+            return
         target_schema = etl_mapping["target_schema"]
         target_table = etl_mapping["target_table"]
         print(f"inserting into {target_schema}.{target_table}")
@@ -62,8 +69,11 @@ class Connector:
             values,
         )
         self.cursor.commit()
-        os.remove(etl_mapping["filename"])
-        print("...done")
+        if "filename" in etl_mapping:
+            os.remove(etl_mapping["filename"])
+        end_time = time.time()
+        duration = round(end_time - start_time)
+        print(f"...done in {duration}s")
 
     def close_conn(self):
         print("closing connection to Fusion DB")
