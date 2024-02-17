@@ -15,7 +15,6 @@ pyodbc = "^5.0.1"
 pyotp = "^2.9.0"
 polars = "^0.19.12"
 prefect = "^2.14.20"
-prefect-dask = "^0.2.6"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.1.3"
