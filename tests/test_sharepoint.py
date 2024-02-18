@@ -2,7 +2,7 @@ import json
 import os
 
 import pytest
-from fusion_etl.connectors import sharepoint
+from fusion_etl.connectors import sp
 from fusion_etl.utils import Credentials
 
 
@@ -45,7 +45,7 @@ def headless_flag():
 
 
 def test_download(unhcr_credentials, totp_counter, etl_mappings, headless_flag):
-    connector = sharepoint.Connector(
+    connector = sp.Connector(
         unhcr_credentials,
         totp_counter,
         etl_mappings,

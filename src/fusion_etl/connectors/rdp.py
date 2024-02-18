@@ -58,8 +58,10 @@ class Connector:
     def query(
         self, etl_mapping: dict[str, str]
     ) -> tuple[list[str], list[tuple[any, ...]]]:
+        print(
+            f"querying {etl_mapping['source_path']}.{etl_mapping['source_name']} in RDP"
+        )
         start_time = time.time()
-        print(f"querying {etl_mapping['source_path']}.{etl_mapping['source_name']}")
         if etl_mapping["source_type"] == "table":
             (column_names, rows) = self._query_table(etl_mapping)
         end_time = time.time()
@@ -83,7 +85,7 @@ class Connector:
         flow = self.app.initiate_device_flow(self.scope)
         with sync_playwright() as playwright:
             self._authenticate_with_playwright(playwright, flow)
-        time.sleep(5)
+        time.sleep(3)
         response = self.app.acquire_token_by_device_flow(flow)
         self.access_token = response["access_token"]
         self.refresh_token = response["refresh_token"]

@@ -39,7 +39,7 @@ class Connector:
         self.conn_attribute = conn_attribute
         print("... done")
 
-    def open_conn(self, refresh_token: str = None):
+    def open_conn(self, refresh_token: str | None = None):
         print("opening connection to Fusion DB")
         self._get_access_token(refresh_token)
         connstring = f"""
@@ -62,10 +62,10 @@ class Connector:
         column_names: list[str],
         rows: list[tuple[any, ...]],
     ):
-        start_time = time.time()
         target_schema = etl_mapping["target_schema"]
         target_table = etl_mapping["target_table"]
-        print(f"inserting into {target_schema}.{target_table}")
+        print(f"inserting into {target_schema}.{target_table} in Fusion DB")
+        start_time = time.time()
         if not rows:
             print("... no rows to insert")
         else:
@@ -85,19 +85,20 @@ class Connector:
         etl_mapping: dict[str, str],
         df: pl.DataFrame,
     ):
-        start_time = time.time()
-        if df.is_empty():
-            return
         target_schema = etl_mapping["target_schema"]
         target_table = etl_mapping["target_table"]
-        print(f"inserting into {target_schema}.{target_table}")
-        (column_names, values) = self._convert_df(df)
-        self.cursor.execute(f"TRUNCATE TABLE [{target_schema}].[{target_table}]")
-        self.cursor.executemany(
-            f"INSERT INTO [{target_schema}].[{target_table}] ({column_names}) VALUES ({', '.join(['?' for _ in values[0]])})",
-            values,
-        )
-        self.cursor.commit()
+        print(f"inserting into {target_schema}.{target_table} in Fusion DB")
+        start_time = time.time()
+        if df.is_empty():
+            print("... no dataframe to insert")
+        else:
+            (column_names, values) = self._convert_df(df)
+            self.cursor.execute(f"TRUNCATE TABLE [{target_schema}].[{target_table}]")
+            self.cursor.executemany(
+                f"INSERT INTO [{target_schema}].[{target_table}] ({column_names}) VALUES ({', '.join(['?' for _ in values[0]])})",
+                values,
+            )
+            self.cursor.commit()
         if "filename" in etl_mapping:
             os.remove(etl_mapping["filename"])
         end_time = time.time()
@@ -110,8 +111,8 @@ class Connector:
         self.conn.close()
         print("... done")
 
-    def _get_access_token(self, refresh_token: str):
-        if not refresh_token:
+    def _get_access_token(self, refresh_token: str | None):
+        if refresh_token is not None:
             self._use_refresh_token(refresh_token)
         elif not self.account:
             self._run_device_flow()
@@ -126,7 +127,7 @@ class Connector:
         flow = self.app.initiate_device_flow(self.scope)
         with sync_playwright() as playwright:
             self._authenticate_with_playwright(playwright, flow)
-        time.sleep(5)
+        time.sleep(3)
         response = self.app.acquire_token_by_device_flow(flow)
         self.access_token = response["access_token"]
         self.account = self.app.get_accounts()[0]
@@ -182,6 +183,7 @@ class Connector:
             .replace(" ", "_")
             .replace("-", "_")
             .replace(":", "_")
+            .replace("/", "_")
             for column_name in df.columns
         ]
         escaped_column_names = [
