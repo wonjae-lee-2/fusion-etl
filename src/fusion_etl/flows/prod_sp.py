@@ -16,7 +16,7 @@ def prod_sp(
     etl_mappings = utils.read_etl_mappings(etl_mappings_path)
     sp_connector = sp.Connector(credentials, headless_flag=headless_flag)
     etl_mappings_with_filename = download_sp(sp_connector, etl_mappings)
-    fusion_connector = fusion.Connector(credentials)
+    fusion_connector = fusion.Connector(credentials, headless_flag=headless_flag)
     fusion_connector.open_conn()
     upload_sp(fusion_connector, etl_mappings_with_filename)
     fusion_connector.close_conn()

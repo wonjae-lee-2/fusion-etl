@@ -13,12 +13,12 @@ def test_sp(
 ):
     # _ = input("Connect to VPN and press enter\n")
     credentials = utils.Credentials(credentials_path)
-    etl_mappings = utils.read_etl_mappings(etl_mappings_path)
+    etl_mappings_for_download = utils.read_etl_mappings(etl_mappings_path)
     sp_connector = sp.Connector(credentials, headless_flag=headless_flag)
-    etl_mappings_with_filename = download_sp(sp_connector, etl_mappings)
-    fusion_connector = fusion.Connector(credentials)
+    etl_mappings_for_upload = download_sp(sp_connector, etl_mappings_for_download)
+    fusion_connector = fusion.Connector(credentials, headless_flag=headless_flag)
     fusion_connector.open_conn()
-    upload_sp(fusion_connector, etl_mappings_with_filename)
+    upload_sp(fusion_connector, etl_mappings_for_upload)
     fusion_connector.close_conn()
 
 
@@ -27,21 +27,21 @@ def download_sp(
     sp_connector: sp.Connector,
     etl_mappings: list[dict[str, str]],
 ) -> list[dict[str, str]]:
-    etl_mappings_with_filename = sp_connector.download(etl_mappings)
-    return etl_mappings_with_filename
+    etl_mappings_for_upload = sp_connector.download(etl_mappings)
+    return etl_mappings_for_upload
 
 
 @task
 def upload_sp(
     fusion_connector: fusion.Connector,
-    etl_mappings_with_filename: list[dict[str, str]],
+    etl_mappings_for_upload: list[dict[str, str]],
 ):
-    for etl_mapping in etl_mappings_with_filename:
-        df = _read_downloaded_file(etl_mapping)
+    for etl_mapping in etl_mappings_for_upload:
+        df = _read_file(etl_mapping)
         fusion_connector.insert_df(etl_mapping, df)
 
 
-def _read_downloaded_file(etl_mapping: dict[str, str]) -> pl.DataFrame:
+def _read_file(etl_mapping: dict[str, str]) -> pl.DataFrame:
     print(f"reading {etl_mapping["filename"]}")
     df = pl.read_csv(etl_mapping["filename"], infer_schema_length=0)
     if etl_mapping["source_name"] == "cost_center_mapping_final.csv":

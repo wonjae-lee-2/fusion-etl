@@ -16,7 +16,7 @@ def test_rdp(
     etl_mappings = utils.read_etl_mappings(etl_mappings_path)
     rdp_connector = rdp.Connector(credentials, headless_flag=headless_flag)
     refresh_token = rdp_connector.open_conn()
-    fusion_connector = fusion.Connector(credentials)
+    fusion_connector = fusion.Connector(credentials, headless_flag=headless_flag)
     fusion_connector.open_conn(refresh_token)
     copy_rdp(rdp_connector, fusion_connector, etl_mappings)
     rdp_connector.close_conn()
