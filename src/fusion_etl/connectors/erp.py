@@ -13,54 +13,58 @@ class Connector:
         base_url: str = "https://fa-esrv-saasfaprod1.fa.ocs.oraclecloud.com",
     ):
         print("initializing Cloud ERP Connector")
-        self.unhcr_credentials = credentials.unhcr
+        self.email = credentials.email
+        self.password = credentials.password
         self.totp_counter = credentials.totp_counter
         self.headless_flag = headless_flag
         self.base_url = base_url
-        self.playwright = None
-        self.browser = None
-        self.authenticated_page = None
         print("...done")
 
-    def start_playwright(self):
-        print("starting playwright for Cloud ERP")
-        self.playwright = sync_playwright().start()
-        self.browser = self.playwright.chromium.launch(headless=self.headless_flag)
-        new_page = self.browser.new_page()
-        self.authenticated_page = self._authenticate(new_page)
-        print("...done")
-
-    def download(self, etl_mapping: dict[str, str]):
-        print(f"downloading {etl_mapping['source_name']}")
-        self._add_download_url(etl_mapping)
-        self._add_filename(etl_mapping)
-        api_request_context = self.authenticated_page.request
-        r = api_request_context.get(etl_mapping["download_url"], timeout=600_000)
-        with open(etl_mapping["filename"], "wb") as f:
-            f.write(r.body())
-        self.authenticated_page.reload()
-        print("...done")
-
-    def stop_playwright(self):
-        print("stopping playwright for Cloud ERP")
-        self.browser.close()
-        self.playwright.stop()
-        print("...done")
+    def download(self, etl_mappings: list[dict[str, str]]) -> list[dict[str, str]]:
+        with sync_playwright() as playwright:
+            browser = playwright.chromium.launch(headless=self.headless_flag)
+            page = browser.new_page()
+            authenticated_page = self._authenticate(page)
+            etl_mappings_with_filename = self._download(
+                authenticated_page,
+                etl_mappings,
+            )
+            browser.close()
+        return etl_mappings_with_filename
 
     def _authenticate(self, page: Page) -> Page:
+        print("authenticating with Cloud ERP")
         home_url = f"{self.base_url}/analytics/saw.dll?bieehome"
         page.goto(home_url)
         page.get_by_role("button", name="Company Single Sign-On").click()
-        page.get_by_placeholder("username@unhcr.org").fill(
-            self.unhcr_credentials["email"]
-        )
+        page.get_by_placeholder("username@unhcr.org").fill(self.email)
         page.get_by_role("button", name="Next").click()
-        page.get_by_placeholder("Password").fill(self.unhcr_credentials["password"])
+        page.get_by_placeholder("Password").fill(self.password)
         page.get_by_role("button", name="Sign in").click()
         page.get_by_placeholder("Code").fill(self.totp_counter.now())
         page.get_by_role("button", name="Verify").click()
         page.get_by_role("button", name="Yes").click()
+        print("... done")
         return page
+
+    def _download(
+        self,
+        authenticated_page: Page,
+        etl_mappings: list[dict[str, str]],
+    ) -> list[dict[str, str]]:
+        for etl_mapping in etl_mappings:
+            print(
+                f"downloading {etl_mapping['source_type']} {etl_mapping['source_name']} from Cloud ERP"
+            )
+            authenticated_page.reload()
+            self._add_download_url(etl_mapping)
+            self._add_filename(etl_mapping)
+            api_request_context = authenticated_page.request
+            r = api_request_context.get(etl_mapping["download_url"], timeout=600_000)
+            with open(etl_mapping["filename"], "wb") as f:
+                f.write(r.body())
+            print("...done")
+        return etl_mappings
 
     def _add_download_url(self, etl_mapping: dict[str, str]):
         match etl_mapping["source_type"]:
