@@ -63,12 +63,10 @@ class Connector:
         self, playwright: Playwright, flow: dict[str, str]
     ):
         browser = playwright.chromium.launch(headless=self.headless_flag)
-        context = browser.new_context()
-        page = context.new_page()
+        page = browser.new_page()
 
         self._authenticate(page, flow)
 
-        context.close()
         browser.close()
 
     def _authenticate(self, page: Page, flow: dict[str, str]):
@@ -88,7 +86,7 @@ class Connector:
         self.access_token = response["access_token"]
 
     def _download_file(self, etl_mapping: dict[str, str]):
-        print(f"downloading {etl_mapping['source_name']} file from Sharepoint")
+        print(f"downloading file {etl_mapping['source_name']} from Sharepoint")
         file_url = f"{self.endpoint}/sites/{self.site_id}/drive/root:{etl_mapping['source_path'] + etl_mapping['source_name']}"
         authorization_header = {"Authorization": f"Bearer {self.access_token}"}
         download_url = self._get_download_url(file_url, authorization_header)
@@ -111,7 +109,7 @@ class Connector:
                 f.write(r.content)
 
     def _download_list(self, etl_mapping: dict[str, str]):
-        print(f"downloading {etl_mapping['source_name']} list from Sharepoint")
+        print(f"downloading list {etl_mapping['source_name']} from Sharepoint")
         rows = self._get_rows(etl_mapping)
         column_name_mapping = self._get_column_name_mapping(etl_mapping)
         columns_to_download = list(column_name_mapping.keys())

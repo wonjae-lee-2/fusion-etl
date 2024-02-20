@@ -1,0 +1,26 @@
+[
+    {
+        "source": "rdp",
+        "source_type": "table",
+        "source_path": "srv",
+        "source_name": "MappingCostCenter",
+        "target_schema": "srv",
+        "target_table": "MappingCostCenter"
+    },
+    {
+        "source": "rdp",
+        "source_type": "table",
+        "source_path": "srv",
+        "source_name": "UDGPIndicatorAGDPopulationType",
+        "target_schema": "srv",
+        "target_table": "UDGPIndicatorAGDPopulationType"
+    },
+    {
+        "source": "rdp",
+        "source_type": "table",
+        "source_path": "srv",
+        "source_name": "ABODBudgetLine",
+        "target_schema": "srv",
+        "target_table": "ABODBudgetLine"
+    }
+]

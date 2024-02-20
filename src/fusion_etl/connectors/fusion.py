@@ -136,10 +136,8 @@ class Connector:
         self, playwright: Playwright, flow: dict[str, str]
     ):
         browser = playwright.chromium.launch(headless=self.headless_flag)
-        context = browser.new_context()
-        page = context.new_page()
+        page = browser.new_page()
         self._authenticate(page, flow)
-        context.close()
         browser.close()
 
     def _authenticate(self, page: Page, flow: dict[str, str]):
