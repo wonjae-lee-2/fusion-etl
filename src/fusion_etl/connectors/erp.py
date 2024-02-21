@@ -1,4 +1,3 @@
-import time
 from urllib.parse import quote
 
 from playwright._impl._errors import TimeoutError
@@ -36,7 +35,6 @@ class Connector:
 
     def _authenticate(self, browser: Browser) -> tuple[BrowserContext, Page]:
         max_retries = 3
-        retry_delay = 30
         for _ in range(max_retries):
             try:
                 print("authenticating with Cloud ERP")
@@ -57,7 +55,6 @@ class Connector:
                 return (context, page)
             except TimeoutError:
                 print("... TimeoutError")
-                time.sleep(retry_delay)
         else:
             print("... failed")
 

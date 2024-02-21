@@ -140,7 +140,6 @@ class Connector:
 
     def _try_authentication(self, browser: Browser, flow: dict[str, str]):
         max_retries = 3
-        retry_delay = 30
         for _ in range(max_retries):
             try:
                 context = browser.new_context()
@@ -159,7 +158,6 @@ class Connector:
                 break
             except TimeoutError:
                 print("... TimeoutError")
-                time.sleep(retry_delay)
         else:
             print("... failed")
 
