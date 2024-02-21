@@ -44,6 +44,7 @@ class Connector:
         page.get_by_placeholder("Code").fill(self.totp_counter.now())
         page.get_by_role("button", name="Verify").click()
         page.get_by_role("button", name="Yes").click()
+        page.goto(home_url)
         print("... done")
         return page
 
