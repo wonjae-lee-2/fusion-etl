@@ -1,6 +1,8 @@
+import time
 from urllib.parse import quote
 
-from playwright.sync_api import Page, sync_playwright
+from playwright._impl._errors import TimeoutError
+from playwright.sync_api import Browser, BrowserContext, Page, sync_playwright
 
 from fusion_etl.utils import Credentials
 
@@ -23,30 +25,41 @@ class Connector:
     def download(self, etl_mappings: list[dict[str, str]]) -> list[dict[str, str]]:
         with sync_playwright() as playwright:
             browser = playwright.chromium.launch(headless=self.headless_flag)
-            page = browser.new_page()
-            authenticated_page = self._authenticate(page)
+            context, authenticated_page = self._authenticate(browser)
             etl_mappings_with_filename = self._download(
                 authenticated_page,
                 etl_mappings,
             )
+            context.close()
             browser.close()
         return etl_mappings_with_filename
 
-    def _authenticate(self, page: Page) -> Page:
-        print("authenticating with Cloud ERP")
-        home_url = f"{self.base_url}/analytics/saw.dll?bieehome"
-        page.goto(home_url)
-        page.get_by_role("button", name="Company Single Sign-On").click()
-        page.get_by_placeholder("username@unhcr.org").fill(self.email)
-        page.get_by_role("button", name="Next").click()
-        page.get_by_placeholder("Password").fill(self.password)
-        page.get_by_role("button", name="Sign in").click()
-        page.get_by_placeholder("Code").fill(self.totp_counter.now())
-        page.get_by_role("button", name="Verify").click()
-        page.get_by_role("button", name="Yes").click()
-        page.goto(home_url)
-        print("... done")
-        return page
+    def _authenticate(self, browser: Browser) -> tuple[BrowserContext, Page]:
+        max_retries = 3
+        retry_delay = 30
+        for _ in range(max_retries):
+            try:
+                print("authenticating with Cloud ERP")
+                context = browser.new_context()
+                page = context.new_page()
+                home_url = f"{self.base_url}/analytics/saw.dll?bieehome"
+                page.goto(home_url)
+                page.get_by_role("button", name="Company Single Sign-On").click()
+                page.get_by_placeholder("username@unhcr.org").fill(self.email)
+                page.get_by_role("button", name="Next").click()
+                page.get_by_placeholder("Password").fill(self.password)
+                page.get_by_role("button", name="Sign in").click()
+                page.get_by_placeholder("Code").fill(self.totp_counter.now())
+                page.get_by_role("button", name="Verify").click()
+                page.get_by_role("button", name="Yes").click()
+                page.goto(home_url)
+                print("... done")
+                return (context, page)
+            except TimeoutError:
+                print("... TimeoutError")
+                time.sleep(retry_delay)
+        else:
+            print("... failed")
 
     def _download(
         self,

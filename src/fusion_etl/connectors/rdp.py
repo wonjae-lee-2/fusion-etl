@@ -3,7 +3,7 @@ import time
 
 import pyodbc
 from msal import PublicClientApplication
-from playwright.sync_api import Page, Playwright, sync_playwright
+from playwright.sync_api import Browser, Playwright, sync_playwright
 
 from fusion_etl.utils import Credentials
 
@@ -84,32 +84,42 @@ class Connector:
     def _run_device_flow(self):
         flow = self.app.initiate_device_flow(self.scope)
         with sync_playwright() as playwright:
-            self._authenticate_with_playwright(playwright, flow)
+            self._authenticate(playwright, flow)
         time.sleep(3)
         response = self.app.acquire_token_by_device_flow(flow)
         self.access_token = response["access_token"]
         self.refresh_token = response["refresh_token"]
         self.account = self.app.get_accounts()[0]
 
-    def _authenticate_with_playwright(
-        self, playwright: Playwright, flow: dict[str, str]
-    ):
+    def _authenticate(self, playwright: Playwright, flow: dict[str, str]):
         browser = playwright.chromium.launch(headless=self.headless_flag)
-        page = browser.new_page()
-        self._authenticate(page, flow)
+        self._try_authentication(browser, flow)
         browser.close()
 
-    def _authenticate(self, page: Page, flow: dict[str, str]):
-        page.goto(flow["verification_uri"])
-        page.get_by_placeholder("Code").fill(flow["user_code"])
-        page.get_by_role("button", name="Next").click()
-        page.get_by_placeholder("Email or phone").fill(self.email)
-        page.get_by_role("button", name="Next").click()
-        page.get_by_placeholder("Password").fill(self.password)
-        page.get_by_placeholder("Password").press("Enter")
-        page.get_by_placeholder("Code").fill(self.totp_counter.now())
-        page.get_by_role("button", name="Verify").click()
-        page.get_by_role("button", name="Continue").click()
+    def _try_authentication(self, browser: Browser, flow: dict[str, str]):
+        max_retries = 3
+        retry_delay = 30
+        for _ in range(max_retries):
+            try:
+                context = browser.new_context()
+                page = context.new_page()
+                page.goto(flow["verification_uri"])
+                page.get_by_placeholder("Code").fill(flow["user_code"])
+                page.get_by_role("button", name="Next").click()
+                page.get_by_placeholder("Email or phone").fill(self.email)
+                page.get_by_role("button", name="Next").click()
+                page.get_by_placeholder("Password").fill(self.password)
+                page.get_by_placeholder("Password").press("Enter")
+                page.get_by_placeholder("Code").fill(self.totp_counter.now())
+                page.get_by_role("button", name="Verify").click()
+                page.get_by_role("button", name="Continue").click()
+                context.close()
+                break
+            except TimeoutError:
+                print("... TimeoutError")
+                time.sleep(retry_delay)
+        else:
+            print("... failed")
 
     def _use_account(self):
         response = self.app.acquire_token_silent(self.scope, self.account)
