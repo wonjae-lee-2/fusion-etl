@@ -3,6 +3,7 @@ import time
 
 import pyodbc
 from msal import PublicClientApplication
+from playwright._impl._errors import TimeoutError
 from playwright.sync_api import Browser, Playwright, sync_playwright
 
 from fusion_etl.utils import Credentials
