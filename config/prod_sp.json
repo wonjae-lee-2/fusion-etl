@@ -4,7 +4,7 @@
         "source_type": "list",
         "source_path": "",
         "source_name": "Situation Allocation Ratios 2023",
-        "target_schema": "sp",
+        "target_schema": "ext",
         "target_table": "Situation_Ratios_23"
     },
     {
@@ -12,7 +12,7 @@
         "source_type": "list",
         "source_path": "",
         "source_name": "Situation Allocation Ratios 2024",
-        "target_schema": "sp",
+        "target_schema": "ext",
         "target_table": "Situation_Ratios_24"
     }
 ]
