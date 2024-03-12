@@ -5,7 +5,7 @@
         "source_path": "/BI Team/04. Processes/Fusion ETL/",
         "source_name": "cost_center_mapping_final.csv",
         "target_schema": "sp",
-        "target_table": "CC_Mapping_Final"
+        "target_table": "Mapping_CC_Final"
     },
     {
         "source": "sharepoint",
