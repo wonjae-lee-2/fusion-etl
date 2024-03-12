@@ -48,6 +48,8 @@ def _read_downloaded_file(etl_mapping: dict[str, str]) -> pl.DataFrame:
         transformed_df = _transform_situation_allocation_ratios_2023(df)
     elif etl_mapping["source_name"] == "Situation Allocation Ratios 2024":
         transformed_df = _transform_situation_allocation_ratios_2024(df)
+    else:
+        transformed_df = df
     print("... done")
     return transformed_df
 
