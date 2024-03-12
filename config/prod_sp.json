@@ -6,5 +6,13 @@
         "source_name": "Situation Allocation Ratios 2024",
         "target_schema": "sp",
         "target_table": "Situation_Ratios_24"
+    },
+    {
+        "source": "sharepoint",
+        "source_type": "file",
+        "source_path": "/BI Team/04. Processes/Fusion ETL/",
+        "source_name": "mapping_EPM_job_code.csv",
+        "target_schema": "sp",
+        "target_table": "Mapping_EPM_Job_Code"
     }
 ]
