@@ -1,0 +1,19 @@
+name: fusion_etl
+
+services:
+  dev:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    volumes:
+      - type: bind
+        source: ..
+        target: /opt/dagster/app/
+      - type: volume
+        source: fusion_etl_dev
+        target: /opt/dagster/storage/
+    ports:
+      - "3000:3000"
+
+volumes:
+  fusion_etl_dev:

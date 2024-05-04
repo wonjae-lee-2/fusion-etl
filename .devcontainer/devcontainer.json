@@ -1,0 +1,19 @@
+{
+  "name": "fusion_etl",
+  "dockerComposeFile": "compose.yaml",
+  "service": "dev",
+  "workspaceFolder": "/opt/dagster/app",
+  "shutdownAction": "stopCompose",
+  "customizations": {
+    "vscode": {
+      "settings": { "python.defaultInterpreterPath": "/opt/dagster/.venv/bin/python" },
+      "extensions": [
+        "visualstudioexptteam.vscodeintellicode",
+        "ms-python.python",
+        "charliermarsh.ruff",
+        "ms-azuretools.vscode-docker",
+        "esbenp.prettier-vscode"
+      ]
+    }
+  }
+}
