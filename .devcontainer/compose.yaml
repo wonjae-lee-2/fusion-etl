@@ -2,6 +2,8 @@ name: fusion_etl
 
 services:
   dev:
+    environment:
+      - DAGSTER_ENV=dev
     build:
       context: ..
       dockerfile: .devcontainer/Dockerfile
