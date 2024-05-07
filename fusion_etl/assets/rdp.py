@@ -24,7 +24,7 @@ def define_blob_rdp_asset(rdp_mapping: dict[str, str]) -> AssetsDefinition:
         azure_blob_resource: AzureBlobResource,
     ) -> MaterializeResult:
         def _query_rdp(rdp_resource: RDPResource) -> list[tuple[int | str, ...]]:
-            source_table = "[" + rdp_mapping["source"].replace(".", "].[") + "]"
+            source_table = rdp_mapping["source"]
             sql = f"""
                 SELECT * FROM {source_table};
             """
@@ -92,7 +92,7 @@ def define_src_rdp_asset(rdp_mapping: dict[str, str]) -> AssetsDefinition:
     def _src_rdp_asset(
         fusion_resource: FusionResource,
     ) -> MaterializeResult:
-        target_table = "[" + rdp_mapping["target"].replace(".", "].[") + "]"
+        target_table = rdp_mapping["target"]
         container_name = os.getenv("DAGSTER_ENV")
         utc_today = datetime.datetime.now(datetime.UTC).strftime("%Y-%m-%d")
         blob_name = f"{utc_today}/{upstream_asset_name}.csv"
