@@ -15,4 +15,4 @@ jobs:
     - name: Stop and remove containers, networks
       run: docker compose down
     - name: Create and start containers
-      run: docker compose up
+      run: docker compose up -d
