@@ -12,10 +12,10 @@ services:
         source: ..
         target: /opt/dagster/app/
       - type: volume
-        source: fusion_etl_dev
+        source: dev
         target: /opt/dagster/storage/
     ports:
       - "3000:3000"
 
 volumes:
-  fusion_etl_dev:
+  dev:

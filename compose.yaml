@@ -9,10 +9,10 @@ services:
       dockerfile: Dockerfile
     volumes:
       - type: volume
-        source: fusion_etl_prod
+        source: prod
         target: /opt/dagster/storage/
     ports:
       - "3000:3000"
 
 volumes:
-  fusion_etl_prod:
+  prod:
