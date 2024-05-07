@@ -6,13 +6,16 @@
   "shutdownAction": "stopCompose",
   "customizations": {
     "vscode": {
-      "settings": { "python.defaultInterpreterPath": "/opt/dagster/.venv/bin/python" },
+      "settings": {
+        "python.defaultInterpreterPath": "/opt/dagster/.venv/bin/python"
+      },
       "extensions": [
         "visualstudioexptteam.vscodeintellicode",
         "ms-python.python",
         "charliermarsh.ruff",
         "ms-azuretools.vscode-docker",
-        "esbenp.prettier-vscode"
+        "esbenp.prettier-vscode",
+        "github.vscode-github-actions"
       ]
     }
   }
