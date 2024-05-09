@@ -1,4 +1,4 @@
-FROM python:3.12.3
+FROM python:3.11.9
 
 ENV DAGSTER_HOME=/opt/dagster/dagster_home/
 
