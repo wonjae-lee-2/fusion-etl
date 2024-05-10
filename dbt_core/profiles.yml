@@ -1,0 +1,19 @@
+dbt_core:
+  target: dev
+  outputs:
+    dev:
+      type: sqlserver
+      driver: "{{ env_var('ODBC_DRIVER') }}"
+      server: "{{ env_var('FUSION_SERVER') }}"
+      port: 1433
+      database: "{{ env_var('FUSION_DATABASE') }}"
+      schema: dev
+      authentication: CLI
+    prod:
+      type: sqlserver
+      driver: "{{ env_var('ODBC_DRIVER') }}"
+      server: "{{ env_var('FUSION_SERVER') }}"
+      port: 1433
+      database: "{{ env_var('FUSION_DATABASE') }}"
+      schema: bi
+      authentication: CLI

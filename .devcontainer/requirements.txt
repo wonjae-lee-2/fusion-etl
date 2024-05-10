@@ -9,6 +9,6 @@ dagster-webserver==1.7.4
 dbt-sqlserver==1.7.4
 playwright==1.43.0
 pyarrow==16.0.0
-pyodbc==5.1.0
+pyodbc<=5.1.0 # == results in a build error
 pytest==8.2.0
 ruff==0.4.3
