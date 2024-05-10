@@ -41,6 +41,8 @@ WORKDIR ${DAGSTER_APP}
 
 COPY id_ed25519 id_ed25519.pub /root/.ssh/
 
+RUN chmod 600 /root/.ssh/id_ed25519
+
 VOLUME [ "${SQLITE_STORAGE_BASE_DIR}" ]
 
 EXPOSE 3000
