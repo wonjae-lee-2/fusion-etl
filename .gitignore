@@ -1,3 +1,5 @@
 .env
+id_ed25519
+id_ed25519.pub
 fusion_etl.egg-info
 __pycache__
