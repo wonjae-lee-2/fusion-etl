@@ -23,8 +23,8 @@ RUN curl -sL https://aka.ms/InstallAzureCLIDeb | bash \
     && curl https://packages.microsoft.com/config/debian/12/prod.list | tee /etc/apt/sources.list.d/mssql-release.list \
     && apt-get update \
     && ACCEPT_EULA=Y apt-get install -y msodbcsql18 \
-    && rm -rf /var/lib/apt/lists/* \
-    && echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
+    && apt-get install -y unixodbc-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR ${DAGSTER_ROOT}
 
@@ -38,6 +38,8 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | sh \
     && playwright install chromium
 
 WORKDIR ${DAGSTER_APP}
+
+COPY id_ed25519 id_ed25519.pub /root/.ssh/
 
 VOLUME [ "${SQLITE_STORAGE_BASE_DIR}" ]
 
