@@ -13,7 +13,7 @@ setup(
         "azure-storage-blob",
         "azure-core",
         "pyarrow",
-        "dbt-sqlserver"
+        "dbt-sqlserver",
     ],
-    extras_require={"dev": ["pytest", "ruff"]},
+    extras_require={"dev": ["pytest", "ruff", "sqlfluff"]},
 )

@@ -9,6 +9,7 @@ dbt_core:
       database: "{{ env_var('FUSION_DATABASE') }}"
       schema: dev
       authentication: CLI
+      threads: 4
     prod:
       type: sqlserver
       driver: "{{ env_var('ODBC_DRIVER') }}"
@@ -17,3 +18,4 @@ dbt_core:
       database: "{{ env_var('FUSION_DATABASE') }}"
       schema: bi
       authentication: CLI
+      threads: 4

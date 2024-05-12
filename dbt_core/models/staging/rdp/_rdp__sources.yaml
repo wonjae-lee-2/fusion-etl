@@ -1,0 +1,16 @@
+version: 2
+
+sources:
+  - name: rdp
+    database: fusion
+    schema: srv
+    tables:
+      - name: OPSBudgetLine
+      - name: ApportionedBudgetLine
+      - name: StrategyValidity
+      - name: OutputStatementValidity
+      - name: OutputStatement
+      - name: OutcomeStatement
+      - name: OutcomeArea
+      - name: ImpactStatement
+      - name: ImpactArea
