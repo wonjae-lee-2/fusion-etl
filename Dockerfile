@@ -10,22 +10,22 @@ RUN mkdir -p ${DAGSTER_HOME} \
     && mkdir -p ${DAGSTER_APP} \
     && mkdir -p ${SQLITE_STORAGE_BASE_DIR}
 
-COPY dagster.yaml ${DAGSTER_HOME}
-
 COPY . ${DAGSTER_APP}
 
-RUN curl -sL https://aka.ms/InstallAzureCLIDeb | bash \
+RUN mv ${DAGSTER_APP}/dagster.yaml ${DAGSTER_HOME} \
+    && curl -sL https://aka.ms/InstallAzureCLIDeb | bash \
     && curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o /usr/share/keyrings/microsoft-prod.gpg \
     && curl https://packages.microsoft.com/config/debian/12/prod.list | tee /etc/apt/sources.list.d/mssql-release.list \
     && apt-get update \
     && ACCEPT_EULA=Y apt-get install -y msodbcsql18 \
-    && rm -rf /var/lib/apt/lists/* \
-    && echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
+    && apt-get install -y unixodbc-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY azureProfile.json msal_token_cache.json /root/.azure/
 
 WORKDIR ${DAGSTER_APP}
 
-RUN rm dagster.yaml \
-    && pip install --no-cache-dir . \
+RUN pip install --no-cache-dir . \
     && playwright install-deps chromium \
     && playwright install chromium
 

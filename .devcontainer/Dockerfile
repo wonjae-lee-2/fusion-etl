@@ -26,6 +26,8 @@ RUN curl -sL https://aka.ms/InstallAzureCLIDeb | bash \
     && apt-get install -y unixodbc-dev \
     && rm -rf /var/lib/apt/lists/*
 
+COPY azureProfile.json msal_token_cache.json /root/.azure/
+
 WORKDIR ${DAGSTER_ROOT}
 
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh \

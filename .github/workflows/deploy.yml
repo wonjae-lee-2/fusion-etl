@@ -12,7 +12,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Write secrets to file
+      - name: Write environment variables to file
         shell: pwsh
         env:
           AZURE_DATABASE_CREDENTIAL_SCOPE: ${{ secrets.AZURE_DATABASE_CREDENTIAL_SCOPE}}
@@ -23,6 +23,7 @@ jobs:
           FUSION_DATABASE: ${{ secrets.FUSION_DATABASE}}
           AZURE_STORAGE_URL: ${{ secrets.AZURE_STORAGE_URL}}
           AZURE_STORAGE_ACCESS_KEY: ${{ secrets.AZURE_STORAGE_ACCESS_KEY}}
+          DBT_PROJECT_DIR: ${{ secrets.DBT_PROJECT_DIR}}
         run: |
           Set-Content -Path .env -Value "AZURE_DATABASE_CREDENTIAL_SCOPE=$env:AZURE_DATABASE_CREDENTIAL_SCOPE"
           Add-Content -Path .env -Value "ODBC_DRIVER=$env:ODBC_DRIVER"
@@ -32,6 +33,16 @@ jobs:
           Add-Content -Path .env -Value "FUSION_DATABASE=$env:FUSION_DATABASE"
           Add-Content -Path .env -Value "AZURE_STORAGE_URL=$env:AZURE_STORAGE_URL"
           Add-Content -Path .env -Value "AZURE_STORAGE_ACCESS_KEY=$env:AZURE_STORAGE_ACCESS_KEY"
+          Add-Content -Path .env -Value "DBT_PROJECT_DIR=$env:DBT_PROJECT_DIR"
+
+      - name: Write azure cli credentials to file
+        shell: pwsh
+        env:
+          AZURE_PROFILE_JSON: ${{ secrets.AZURE_PROFILE_JSON}}
+          MSAL_TOKEN_CACHE_JSON: ${{ secrets.MSAL_TOKEN_CACHE_JSON}}
+        run: |
+          Set-Content -Path azureProfile.json -Value $env:AZURE_PROFILE_JSON
+          Set-Content -Path msal_token_cache.json -Value $env:MSAL_TOKEN_CACHE_JSON
 
       - name: Stop and remove containers, networks
         run: docker compose down
