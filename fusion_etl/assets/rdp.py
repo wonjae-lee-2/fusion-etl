@@ -1,16 +1,18 @@
 import csv
 import datetime
 import io
-import os
 
-from dagster import AssetsDefinition, MaterializeResult, asset
+from dagster import AssetsDefinition, MaterializeResult, asset, EnvVar
 
-from ..resources.azure_blob import AzureBlobResource
+from ..resources.azure import AzureBlobResource
 from ..resources.fusion import FusionResource
 from ..resources.rdp import RDPResource
 
 
-def define_blob_rdp_asset(rdp_mapping: dict[str, str]) -> AssetsDefinition:
+def define_blob_rdp_asset(
+    rdp_mapping: dict[str, str],
+    dagster_env: EnvVar,
+) -> AssetsDefinition:
     asset_name = f"blob_rdp__{rdp_mapping['name']}"
 
     @asset(
@@ -42,7 +44,7 @@ def define_blob_rdp_asset(rdp_mapping: dict[str, str]) -> AssetsDefinition:
             azure_blob_resource: AzureBlobResource,
             rows_with_header: list[tuple[int | str, ...]],
         ) -> tuple[str | None, str]:
-            container_name = os.getenv("DAGSTER_ENV")
+            container_name = dagster_env.get_value()
             utc_today = datetime.datetime.now(datetime.UTC).strftime("%Y-%m-%d")
             blob_name = f"{utc_today}/{asset_name}.csv"
 
@@ -78,7 +80,10 @@ def define_blob_rdp_asset(rdp_mapping: dict[str, str]) -> AssetsDefinition:
     return _blob_rdp_asset
 
 
-def define_src_rdp_asset(rdp_mapping: dict[str, str]) -> AssetsDefinition:
+def define_src_rdp_asset(
+    rdp_mapping: dict[str, str],
+    dagster_env: EnvVar,
+) -> AssetsDefinition:
     asset_name = f"src_rdp__{rdp_mapping['name']}"
     upstream_asset_name = f"blob_rdp__{rdp_mapping['name']}"
 
@@ -93,7 +98,7 @@ def define_src_rdp_asset(rdp_mapping: dict[str, str]) -> AssetsDefinition:
         fusion_resource: FusionResource,
     ) -> MaterializeResult:
         target_table = rdp_mapping["target"]
-        container_name = os.getenv("DAGSTER_ENV")
+        container_name = dagster_env.get_value()
         utc_today = datetime.datetime.now(datetime.UTC).strftime("%Y-%m-%d")
         blob_name = f"{utc_today}/{upstream_asset_name}.csv"
         sql = f"""

@@ -1,13 +1,20 @@
 from dagster import Definitions, EnvVar
+from dagster_dbt import DbtCliResource
 
 from .assets.mappings import RDP_MAPPINGS
 from .assets.rdp import define_blob_rdp_asset, define_src_rdp_asset
-from .resources.azure_blob import AzureBlobResource
+from .resources.azure import AzureBlobResource
 from .resources.fusion import FusionResource
 from .resources.rdp import RDPResource
 
-blob_rdp_assets = [define_blob_rdp_asset(rdp_mapping) for rdp_mapping in RDP_MAPPINGS]
-source_rdp_assets = [define_src_rdp_asset(rdp_mapping) for rdp_mapping in RDP_MAPPINGS]
+blob_rdp_assets = [
+    define_blob_rdp_asset(rdp_mapping, EnvVar("DAGSTER_ENV"))
+    for rdp_mapping in RDP_MAPPINGS
+]
+source_rdp_assets = [
+    define_src_rdp_asset(rdp_mapping, EnvVar("DAGSTER_ENV"))
+    for rdp_mapping in RDP_MAPPINGS
+]
 
 azure_blob_resource = AzureBlobResource(
     account_url=EnvVar("AZURE_STORAGE_URL"),
@@ -25,6 +32,7 @@ fusion_resource = FusionResource(
     fusion_server=EnvVar("FUSION_SERVER"),
     fusion_database=EnvVar("FUSION_DATABASE"),
 )
+dbt_resource = DbtCliResource(project_dir=EnvVar("DBT_PROJECT_DIR").get_value())
 
 defs = Definitions(
     assets=blob_rdp_assets + source_rdp_assets,
@@ -32,5 +40,6 @@ defs = Definitions(
         "azure_blob_resource": azure_blob_resource,
         "rdp_resource": rdp_resource,
         "fusion_resource": fusion_resource,
+        "dbt_resource": dbt_resource,
     },
 )
