@@ -5,3 +5,4 @@ azureProfile.json
 msal_token_cache.json
 fusion_etl.egg-info
 __pycache__
+dbt_core/analyses/*.ipynb
