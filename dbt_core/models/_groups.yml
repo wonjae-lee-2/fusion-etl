@@ -1,0 +1,12 @@
+version: 2
+
+groups:
+  - name: stg_dbt
+    owner:
+      name: dbt_core
+  - name: int_dbt
+    owner:
+      name: dbt_core
+  - name: bi_dbt
+    owner:
+      name: dbt_core
