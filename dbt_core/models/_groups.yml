@@ -7,6 +7,6 @@ groups:
   - name: int_dbt
     owner:
       name: dbt_core
-  - name: bi_dbt
+  - name: dw_dbt
     owner:
       name: dbt_core
