@@ -1,12 +1,37 @@
 import csv
-import datetime
 import io
+import json
+from pathlib import Path
 
-from dagster import AssetsDefinition, MaterializeResult, asset, EnvVar
+from dagster import AssetsDefinition, EnvVar, MaterializeResult, asset
 
 from ..resources.azure import AzureBlobResource
 from ..resources.fusion import FusionResource
 from ..resources.rdp import RDPResource
+
+
+def _get_rdp_timestamp_date() -> str:
+    timestamps_path = (
+        Path(EnvVar("SQLITE_STORAGE_BASE_DIR").get_value())
+        .joinpath("timestamps.json")
+        .resolve()
+    )
+
+    if not timestamps_path.is_file():
+        raise FileNotFoundError(
+            f"timestamps.json was not found at {timestamps_path}. Please run the rdp timestamp sensor first."
+        )
+
+    with open(timestamps_path, "r") as f:
+        timestamps: dict[str, str] = json.load(f)
+    rdp_timestamp = timestamps.get("rdp")
+
+    if not rdp_timestamp:
+        raise ValueError(
+            "The rdp timestamp was not found in timestamps.json. Please run the rdp timestamp sensor first."
+        )
+
+    return rdp_timestamp[:10]
 
 
 def define_blob_rdp_asset(
@@ -16,7 +41,7 @@ def define_blob_rdp_asset(
     asset_name = f"blob_rdp__{rdp_mapping['name']}"
 
     @asset(
-        key_prefix="blob",
+        key_prefix="rdp",
         group_name="blob_rdp",
         name=asset_name,
         compute_kind="python",
@@ -45,8 +70,8 @@ def define_blob_rdp_asset(
             rows_with_header: list[tuple[int | str, ...]],
         ) -> tuple[str | None, str]:
             container_name = dagster_env.get_value()
-            utc_today = datetime.datetime.now(datetime.UTC).strftime("%Y-%m-%d")
-            blob_name = f"{utc_today}/{asset_name}.csv"
+            rdp_timestamp_date = _get_rdp_timestamp_date()
+            blob_name = f"{rdp_timestamp_date}/{asset_name}.csv"
 
             with io.StringIO(newline="") as buffer:
                 writer = csv.writer(buffer)
@@ -88,19 +113,19 @@ def define_src_rdp_asset(
     upstream_asset_name = f"blob_rdp__{rdp_mapping['name']}"
 
     @asset(
-        key_prefix="src",
+        key_prefix="rdp",
         group_name="src_rdp",
         name=asset_name,
         compute_kind="sql",
-        deps=[["blob", upstream_asset_name]],
+        deps=[["rdp", upstream_asset_name]],
     )
     def _src_rdp_asset(
         fusion_resource: FusionResource,
     ) -> MaterializeResult:
         target_table = rdp_mapping["target"]
         container_name = dagster_env.get_value()
-        utc_today = datetime.datetime.now(datetime.UTC).strftime("%Y-%m-%d")
-        blob_name = f"{utc_today}/{upstream_asset_name}.csv"
+        rdp_timestamp_date = _get_rdp_timestamp_date()
+        blob_name = f"{rdp_timestamp_date}/{upstream_asset_name}.csv"
         sql = f"""
             EXEC dagster_bulk_insert_azure_blob
                 '{target_table}',

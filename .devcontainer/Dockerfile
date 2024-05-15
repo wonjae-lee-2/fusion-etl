@@ -4,19 +4,19 @@ ARG DAGSTER_ROOT=/opt/dagster/
 
 ENV DAGSTER_HOME=/opt/dagster/dagster_home/
 
-ARG DAGSTER_APP=/opt/dagster/app/
+ARG DAGSTER_APP_DIR=/opt/dagster/app/
 
 ENV SQLITE_STORAGE_BASE_DIR=/opt/dagster/storage/
 
 RUN mkdir -p ${DAGSTER_HOME} \
-    && mkdir -p ${DAGSTER_APP} \
+    && mkdir -p ${DAGSTER_APP_DIR} \
     && mkdir -p ${SQLITE_STORAGE_BASE_DIR}
 
 COPY .devcontainer/requirements.txt ${DAGSTER_ROOT}
 
 COPY dagster.yaml ${DAGSTER_HOME}
 
-COPY workspace.yaml ${DAGSTER_APP}
+COPY workspace.yaml ${DAGSTER_APP_DIR}
 
 RUN curl -sL https://aka.ms/InstallAzureCLIDeb | bash \
     && curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o /usr/share/keyrings/microsoft-prod.gpg \
@@ -26,7 +26,7 @@ RUN curl -sL https://aka.ms/InstallAzureCLIDeb | bash \
     && apt-get install -y unixodbc-dev \
     && rm -rf /var/lib/apt/lists/*
 
-COPY azureProfile.json msal_token_cache.json /root/.azure/
+COPY config/azureProfile.json config/msal_token_cache.json /root/.azure/
 
 WORKDIR ${DAGSTER_ROOT}
 
@@ -39,9 +39,9 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | sh \
     && playwright install-deps chromium \
     && playwright install chromium
 
-WORKDIR ${DAGSTER_APP}
+WORKDIR ${DAGSTER_APP_DIR}
 
-COPY id_ed25519 id_ed25519.pub /root/.ssh/
+COPY config/id_ed25519 config/id_ed25519.pub /root/.ssh/
 
 RUN chmod 600 /root/.ssh/id_ed25519
 

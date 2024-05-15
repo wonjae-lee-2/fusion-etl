@@ -1,8 +1,5 @@
 .env
-id_ed25519
-id_ed25519.pub
-azureProfile.json
-msal_token_cache.json
+config
 fusion_etl.egg-info
 __pycache__
 dbt_core/analyses/*.ipynb
