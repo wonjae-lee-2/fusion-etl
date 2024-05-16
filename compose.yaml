@@ -17,3 +17,4 @@ services:
 
 volumes:
   prod:
+    driver: local

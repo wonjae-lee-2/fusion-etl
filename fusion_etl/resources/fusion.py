@@ -8,6 +8,7 @@ from dagster import ConfigurableResource
 
 
 class FusionResource(ConfigurableResource):
+    SQL_COPT_SS_ACCESS_TOKEN: int = 1256
     azure_database_credential_scope: str
     odbc_driver: str
     fusion_server: str
@@ -29,8 +30,7 @@ class FusionResource(ConfigurableResource):
     def _get_pyodbc_attrs_before(self) -> dict[int, bytes]:
         token = self._get_cli_access_token()
         token_bytes = self._convert_access_token_to_mswindows_byte_string(token)
-        sql_copt_ss_access_token = 1256
-        attrs_before = {sql_copt_ss_access_token: token_bytes}
+        attrs_before = {self.SQL_COPT_SS_ACCESS_TOKEN: token_bytes}
         return attrs_before
 
     def _get_cli_access_token(self) -> AccessToken:
