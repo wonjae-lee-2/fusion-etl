@@ -5,3 +5,8 @@ rdp_job = define_asset_job(
     selection=AssetSelection.key_prefixes("rdp"),
     tags={"target": "rdp"},
 )
+dbt_job = define_asset_job(
+    "dbt_job",
+    selection=AssetSelection.key_prefixes("dbt"),
+    tags={"target": "dbt"},
+)

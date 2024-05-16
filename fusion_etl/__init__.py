@@ -7,7 +7,7 @@ from .assets.rdp import define_blob_rdp_asset, define_src_rdp_asset
 from .resources.azure import AzureBlobResource
 from .resources.fusion import FusionResource
 from .resources.rdp import RDPResource
-from .sensors.rdp import rdp_timestamp_sensor
+from .sensors.rdp import rdp_run_status_sensor, rdp_timestamp_sensor
 
 blob_rdp_assets = [
     define_blob_rdp_asset(rdp_mapping, EnvVar("DAGSTER_ENV"))
@@ -38,7 +38,7 @@ fusion_resource = FusionResource(
 dbt_project_dir = EnvVar("DBT_PROJECT_DIR").get_value()
 dbt_resource = DbtCliResource(project_dir=dbt_project_dir)
 
-all_sensors = [rdp_timestamp_sensor]
+all_sensors = [rdp_timestamp_sensor, rdp_run_status_sensor]
 
 defs = Definitions(
     assets=[*blob_rdp_assets, *source_rdp_assets, *dbt_assets],

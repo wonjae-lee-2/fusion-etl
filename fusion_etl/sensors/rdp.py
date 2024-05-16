@@ -2,9 +2,17 @@ import json
 from datetime import datetime
 from pathlib import Path
 
-from dagster import EnvVar, RunRequest, SensorEvaluationContext, sensor
+from dagster import (
+    DagsterRunStatus,
+    EnvVar,
+    RunRequest,
+    RunStatusSensorContext,
+    SensorEvaluationContext,
+    run_status_sensor,
+    sensor,
+)
 
-from ..jobs import rdp_job
+from ..jobs import dbt_job, rdp_job
 from ..resources.rdp import RDPResource
 
 timestamps_path = (
@@ -58,3 +66,15 @@ def rdp_timestamp_sensor(
             json.dump(timestamps, f)
 
         return RunRequest(run_key=current_rdp_timestamp)
+
+
+@run_status_sensor(
+    run_status=DagsterRunStatus.SUCCESS,
+    monitored_jobs=[rdp_job],
+    request_job=dbt_job,
+)
+def rdp_run_status_sensor(context: RunStatusSensorContext) -> RunRequest:
+    timestamps = _get_timestamps()
+    rdp_timestamp = timestamps.get("rdp")
+
+    return RunRequest(run_key=rdp_timestamp)
