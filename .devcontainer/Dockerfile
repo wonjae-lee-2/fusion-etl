@@ -2,14 +2,19 @@ FROM python:3.11.9
 
 ARG DAGSTER_ROOT=/opt/dagster/
 
+ENV DAGSTER_HOME=/opt/dagster/dagster_home/
+
 ARG DAGSTER_APP_DIR=/opt/dagster/app/
 
 ENV SQLITE_STORAGE_BASE_DIR=/opt/dagster/storage/
 
-RUN mkdir -p ${DAGSTER_APP_DIR} \
+RUN mkdir -p ${DAGSTER_HOME} \
+    && mkdir -p ${DAGSTER_APP_DIR} \
     && mkdir -p ${SQLITE_STORAGE_BASE_DIR}
 
 COPY .devcontainer/requirements.txt ${DAGSTER_ROOT}
+
+COPY dagster.yaml ${DAGSTER_HOME}
 
 RUN curl -sL https://aka.ms/InstallAzureCLIDeb | bash \
     && curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o /usr/share/keyrings/microsoft-prod.gpg \
