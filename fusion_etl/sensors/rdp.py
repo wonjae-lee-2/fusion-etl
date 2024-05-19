@@ -22,7 +22,7 @@ timestamps_path = (
 )
 
 
-def _get_timestamps() -> dict:
+def _read_timestamps() -> dict:
     if timestamps_path.is_file():
         with open(timestamps_path, "r") as f:
             timestamps: dict = json.load(f)
@@ -32,7 +32,7 @@ def _get_timestamps() -> dict:
     return timestamps
 
 
-def _get_current_rdp_timestamp(rdp_resource: RDPResource) -> str:
+def _get_rdp_timestamp(rdp_resource: RDPResource) -> str:
     sql = """
         SELECT MAX(ExecutionEndTime)
         FROM srv._ExecutionLog
@@ -55,9 +55,9 @@ def _get_current_rdp_timestamp(rdp_resource: RDPResource) -> str:
 def rdp_timestamp_sensor(
     context: SensorEvaluationContext, rdp_resource: RDPResource
 ) -> RunRequest:
-    timestamps = _get_timestamps()
+    timestamps = _read_timestamps()
     previous_rdp_timestamp = timestamps.get("rdp")
-    current_rdp_timestamp = _get_current_rdp_timestamp(rdp_resource)
+    current_rdp_timestamp = _get_rdp_timestamp(rdp_resource)
 
     if previous_rdp_timestamp != current_rdp_timestamp:
         timestamps["rdp"] = current_rdp_timestamp
@@ -65,7 +65,7 @@ def rdp_timestamp_sensor(
         with open(timestamps_path, "w") as f:
             json.dump(timestamps, f)
 
-        return RunRequest(run_key=current_rdp_timestamp)
+    return RunRequest(run_key=current_rdp_timestamp)
 
 
 @run_status_sensor(
@@ -74,7 +74,7 @@ def rdp_timestamp_sensor(
     request_job=dbt_job,
 )
 def rdp_run_status_sensor(context: RunStatusSensorContext) -> RunRequest:
-    timestamps = _get_timestamps()
+    timestamps = _read_timestamps()
     rdp_timestamp = timestamps.get("rdp")
 
     return RunRequest(run_key=rdp_timestamp)
