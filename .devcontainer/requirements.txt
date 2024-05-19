@@ -20,7 +20,11 @@ pyarrow==16.0.0
     # via fusion-etl (setup.py)
 pyodbc<=5.1.0
     # via fusion-etl (setup.py)
+pyotp==2.9.0
+    # via fusion-etl (setup.py)
 pytest==8.2.0
+    # via fusion-etl (setup.py)
+requests==2.31.0
     # via fusion-etl (setup.py)
 ruff==0.4.3
     # via fusion-etl (setup.py)

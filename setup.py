@@ -14,6 +14,8 @@ setup(
         "azure-core",
         "pyarrow",
         "dbt-sqlserver",
+        "pyotp",
+        "requests",
     ],
     extras_require={"dev": ["pytest", "ruff", "sqlfluff"]},
 )
