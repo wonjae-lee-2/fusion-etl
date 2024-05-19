@@ -8,7 +8,7 @@ run_coordinator:
   class: QueuedRunCoordinator
   config:
     tag_concurrency_limits:
-      - key: "target"
+      - key: "target_prefix"
         value:
           applyLimitPerUniqueValue: true
         limit: 1
