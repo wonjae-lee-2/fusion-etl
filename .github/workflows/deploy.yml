@@ -24,6 +24,13 @@ jobs:
           AZURE_STORAGE_URL: ${{ secrets.AZURE_STORAGE_URL}}
           AZURE_STORAGE_ACCESS_KEY: ${{ secrets.AZURE_STORAGE_ACCESS_KEY}}
           DBT_PROJECT_DIR: ${{ secrets.DBT_PROJECT_DIR}}
+          ORACLE_ANALYTICS_PUBLISHER_URL: ${{ secrets.ORACLE_ANALYTICS_PUBLISHER_URL}}
+          UNHCR_EMAIL: ${{ secrets.UNHCR_EMAIL}}
+          UNHCR_PASSWORD: ${{ secrets.UNHCR_PASSWORD}}
+          TOTP_SECRET_KEY: ${{ secrets.TOTP_SECRET_KEY}}
+          JOB_INFO_URL: ${{ secrets.JOB_INFO_URL}}
+          OUTPUT_INFO_URL: ${{ secrets.OUTPUT_INFO_URL}}
+          OUTPUT_DOWNLOAD_URL: ${{ secrets.OUTPUT_DOWNLOAD_URL}}
         run: |
           Set-Content -Path .env -Value "AZURE_DATABASE_CREDENTIAL_SCOPE=$env:AZURE_DATABASE_CREDENTIAL_SCOPE"
           Add-Content -Path .env -Value "ODBC_DRIVER=$env:ODBC_DRIVER"
@@ -34,6 +41,13 @@ jobs:
           Add-Content -Path .env -Value "AZURE_STORAGE_URL=$env:AZURE_STORAGE_URL"
           Add-Content -Path .env -Value "AZURE_STORAGE_ACCESS_KEY=$env:AZURE_STORAGE_ACCESS_KEY"
           Add-Content -Path .env -Value "DBT_PROJECT_DIR=$env:DBT_PROJECT_DIR"
+          Add-Content -Path .env -Value "ORACLE_ANALYTICS_PUBLISHER_URL=$env:ORACLE_ANALYTICS_PUBLISHER_URL"
+          Add-Content -Path .env -Value "UNHCR_EMAIL=$env:UNHCR_EMAIL"
+          Add-Content -Path .env -Value "UNHCR_PASSWORD=$env:UNHCR_PASSWORD"
+          Add-Content -Path .env -Value "TOTP_SECRET_KEY=$env:TOTP_SECRET_KEY"
+          Add-Content -Path .env -Value "JOB_INFO_URL=$env:JOB_INFO_URL"
+          Add-Content -Path .env -Value "OUTPUT_INFO_URL=$env:OUTPUT_INFO_URL"
+          Add-Content -Path .env -Value "OUTPUT_DOWNLOAD_URL=$env:OUTPUT_DOWNLOAD_URL"
 
       - name: Write azure cli credentials to file
         shell: pwsh
