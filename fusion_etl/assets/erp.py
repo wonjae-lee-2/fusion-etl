@@ -122,38 +122,39 @@ def define_blob_erp_asset(
     return _blob_erp_asset
 
 
-# def define_src_erp_asset(
-#     erp_mapping: dict[str, str],
-#     dagster_env: EnvVar,
-# ) -> AssetsDefinition:
-#     asset_name = f"src_erp__{erp_mapping['name']}"
-#     upstream_asset_name = f"blob_erp__{erp_mapping['name']}"
+def define_src_erp_asset(
+    erp_mapping: dict[str, str],
+    dagster_env: EnvVar,
+) -> AssetsDefinition:
+    asset_name = f"src_erp__{erp_mapping['name']}"
+    upstream_asset_name = f"blob_erp__{erp_mapping['name']}"
 
-#     @asset(
-#         key_prefix="erp",
-#         group_name="src_rdp",
-#         name=asset_name,
-#         compute_kind="sql",
-#         deps=[["rdp", upstream_asset_name]],
-#     )
-#     def _src_erp_asset(
-#         fusion_resource: FusionResource,
-#     ) -> MaterializeResult:
-#         target_table = erp_mapping["target"]
-#         container_name = dagster_env.get_value()
-#         erp_timestamp_date = _read_erp_timestamp_date(timestamps_path)
-#         blob_name = f"{erp_timestamp_date}/{upstream_asset_name}.csv"
-#         sql = f"""
-#             EXEC dagster_bulk_insert_azure_blob
-#                 '{target_table}',
-#                 '{container_name}',
-#                 '{blob_name}';
-#         """
+    @asset(
+        key_prefix="erp",
+        group_name="src_erp",
+        name=asset_name,
+        compute_kind="sql",
+        deps=[["erp", upstream_asset_name]],
+    )
+    def _src_erp_asset(
+        fusion_resource: FusionResource,
+    ) -> MaterializeResult:
+        target_table = erp_mapping["target"]
+        container_name = dagster_env.get_value()
+        _, job_timestamp = _read_output_timestamp(timestamps_path, erp_mapping)
+        job_timestamp_date = job_timestamp[:10]
+        blob_name = f"{job_timestamp_date}/{upstream_asset_name}.csv"
+        sql = f"""
+            EXEC dagster_bulk_insert_azure_blob_lf
+                '{target_table}',
+                '{container_name}',
+                '{blob_name}';
+        """
 
-#         with fusion_resource.connect() as conn:
-#             with conn.cursor() as cursor:
-#                 cursor.execute(sql)
+        with fusion_resource.connect() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(sql)
 
-#         return MaterializeResult(metadata={"Table Name": erp_mapping["target"]})
+        return MaterializeResult(metadata={"Table Name": erp_mapping["target"]})
 
-#     return _src_erp_asset
+    return _src_erp_asset

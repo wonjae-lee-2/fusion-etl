@@ -2,7 +2,7 @@ from dagster import Definitions, EnvVar, load_assets_from_modules
 from dagster_dbt import DbtCliResource
 
 from .assets import dbt
-from .assets.erp import define_blob_erp_asset
+from .assets.erp import define_blob_erp_asset, define_src_erp_asset
 from .assets.erp_mappings import ERP_MAPPINGS
 from .assets.rdp import define_blob_rdp_asset, define_src_rdp_asset
 from .assets.rdp_mappings import RDP_MAPPINGS
@@ -15,6 +15,10 @@ from .sensors.rdp import rdp_run_status_sensor, rdp_timestamp_sensor
 
 blob_erp_assets = [
     define_blob_erp_asset(erp_mapping, EnvVar("DAGSTER_ENV"))
+    for erp_mapping in ERP_MAPPINGS
+]
+source_erp_assets = [
+    define_src_erp_asset(erp_mapping, EnvVar("DAGSTER_ENV"))
     for erp_mapping in ERP_MAPPINGS
 ]
 blob_rdp_assets = [
@@ -53,7 +57,13 @@ dbt_resource = DbtCliResource(project_dir=dbt_project_dir)
 
 
 defs = Definitions(
-    assets=[*blob_erp_assets, *blob_rdp_assets, *source_rdp_assets, *dbt_assets],
+    assets=[
+        *blob_erp_assets,
+        *source_erp_assets,
+        *blob_rdp_assets,
+        *source_rdp_assets,
+        *dbt_assets,
+    ],
     resources={
         "azure_blob_resource": azure_blob_resource,
         "erp_resource": erp_resource,
