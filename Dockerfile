@@ -29,7 +29,7 @@ RUN pip install --no-cache-dir . \
     && playwright install-deps chromium \
     && playwright install chromium \
     && cd dbt_core \
-    && dep deps
+    && dbt deps
 
 VOLUME [ "${SQLITE_STORAGE_BASE_DIR}" ]
 
