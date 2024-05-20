@@ -11,8 +11,8 @@ models:
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
+            - tree_version_name
             - dep25_pk1_value
-            - dep25_pk2_value
     columns:
       - name: dep25_pk1_value
         tests:

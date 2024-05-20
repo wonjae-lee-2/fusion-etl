@@ -10,7 +10,7 @@ from .resources.azure import AzureBlobResource
 from .resources.erp import ERPResource
 from .resources.fusion import FusionResource
 from .resources.rdp import RDPResource
-from .sensors.erp import erp_timestamp_sensor
+from .sensors.erp import erp_run_status_sensor, erp_timestamp_sensor
 from .sensors.rdp import rdp_run_status_sensor, rdp_timestamp_sensor
 
 blob_erp_assets = [
@@ -71,5 +71,10 @@ defs = Definitions(
         "fusion_resource": fusion_resource,
         "dbt_resource": dbt_resource,
     },
-    sensors=[rdp_timestamp_sensor, rdp_run_status_sensor, erp_timestamp_sensor],
+    sensors=[
+        rdp_timestamp_sensor,
+        rdp_run_status_sensor,
+        erp_timestamp_sensor,
+        erp_run_status_sensor,
+    ],
 )
