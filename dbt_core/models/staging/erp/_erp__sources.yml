@@ -1,0 +1,9 @@
+version: 2
+
+sources:
+  - name: erp
+    database: fusion
+    schema: erp
+    tables:
+      - name: FND_VS_VALUES_B
+      - name: GL_SEG_VAL_HIER_CF

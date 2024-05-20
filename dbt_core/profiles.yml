@@ -16,6 +16,6 @@ dbt_core:
       server: "{{ env_var('FUSION_SERVER') }}"
       port: 1433
       database: "{{ env_var('FUSION_DATABASE') }}"
-      schema: bi
+      schema: prd
       authentication: CLI
       threads: 4

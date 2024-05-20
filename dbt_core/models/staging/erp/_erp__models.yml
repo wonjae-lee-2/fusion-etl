@@ -1,0 +1,76 @@
+version: 2
+
+models:
+  - name: stg_erp__fnd_vs_values_b
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - attribute_category
+            - value
+  - name: stg_erp__gl_seg_val_hier_cf
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - dep25_pk1_value
+            - dep25_pk2_value
+    columns:
+      - name: dep25_pk1_value
+        tests:
+          - relationships:
+              to: ref('stg_erp__fnd_vs_values_b')
+              field: value
+      - name: dep25_pk2_value
+        tests:
+          - relationships:
+              to: ref('stg_erp__fnd_vs_values_b')
+              field: attribute_category
+      - name: dep26_pk1_value
+        tests:
+          - relationships:
+              to: ref('stg_erp__fnd_vs_values_b')
+              field: value
+      - name: dep26_pk2_value
+        tests:
+          - relationships:
+              to: ref('stg_erp__fnd_vs_values_b')
+              field: attribute_category
+      - name: dep27_pk1_value
+        tests:
+          - relationships:
+              to: ref('stg_erp__fnd_vs_values_b')
+              field: value
+      - name: dep27_pk2_value
+        tests:
+          - relationships:
+              to: ref('stg_erp__fnd_vs_values_b')
+              field: attribute_category
+      - name: dep28_pk1_value
+        tests:
+          - relationships:
+              to: ref('stg_erp__fnd_vs_values_b')
+              field: value
+      - name: dep28_pk2_value
+        tests:
+          - relationships:
+              to: ref('stg_erp__fnd_vs_values_b')
+              field: attribute_category
+      - name: dep29_pk1_value
+        tests:
+          - relationships:
+              to: ref('stg_erp__fnd_vs_values_b')
+              field: value
+      - name: dep29_pk2_value
+        tests:
+          - relationships:
+              to: ref('stg_erp__fnd_vs_values_b')
+              field: attribute_category
+      - name: dep30_pk1_value
+        tests:
+          - relationships:
+              to: ref('stg_erp__fnd_vs_values_b')
+              field: value
+      - name: dep30_pk2_value
+        tests:
+          - relationships:
+              to: ref('stg_erp__fnd_vs_values_b')
+              field: attribute_category
