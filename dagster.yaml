@@ -7,8 +7,4 @@ run_coordinator:
   module: dagster.core.run_coordinator
   class: QueuedRunCoordinator
   config:
-    tag_concurrency_limits:
-      - key: "target_prefix"
-        value:
-          applyLimitPerUniqueValue: true
-        limit: 1
+    max_concurrent_runs: 1
