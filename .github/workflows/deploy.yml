@@ -61,5 +61,8 @@ jobs:
       - name: Stop and remove containers, networks
         run: docker compose down
 
+      - name: Remove unused data
+        run: docker system prune -f
+
       - name: Create and start containers
         run: docker compose up --build -d
