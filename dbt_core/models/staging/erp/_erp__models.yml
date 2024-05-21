@@ -1,13 +1,13 @@
 version: 2
 
 models:
-  - name: stg_erp__fnd_vs_values_b
+  - name: base_erp__fnd_vs_values_b
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
             - attribute_category
             - value
-  - name: stg_erp__gl_seg_val_hier_cf
+  - name: base_erp__gl_seg_val_hier_cf
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
@@ -17,60 +17,66 @@ models:
       - name: dep25_pk1_value
         tests:
           - relationships:
-              to: ref('stg_erp__fnd_vs_values_b')
+              to: ref('base_erp__fnd_vs_values_b')
               field: value
       - name: dep25_pk2_value
         tests:
           - relationships:
-              to: ref('stg_erp__fnd_vs_values_b')
+              to: ref('base_erp__fnd_vs_values_b')
               field: attribute_category
       - name: dep26_pk1_value
         tests:
           - relationships:
-              to: ref('stg_erp__fnd_vs_values_b')
+              to: ref('base_erp__fnd_vs_values_b')
               field: value
       - name: dep26_pk2_value
         tests:
           - relationships:
-              to: ref('stg_erp__fnd_vs_values_b')
+              to: ref('base_erp__fnd_vs_values_b')
               field: attribute_category
       - name: dep27_pk1_value
         tests:
           - relationships:
-              to: ref('stg_erp__fnd_vs_values_b')
+              to: ref('base_erp__fnd_vs_values_b')
               field: value
       - name: dep27_pk2_value
         tests:
           - relationships:
-              to: ref('stg_erp__fnd_vs_values_b')
+              to: ref('base_erp__fnd_vs_values_b')
               field: attribute_category
       - name: dep28_pk1_value
         tests:
           - relationships:
-              to: ref('stg_erp__fnd_vs_values_b')
+              to: ref('base_erp__fnd_vs_values_b')
               field: value
       - name: dep28_pk2_value
         tests:
           - relationships:
-              to: ref('stg_erp__fnd_vs_values_b')
+              to: ref('base_erp__fnd_vs_values_b')
               field: attribute_category
       - name: dep29_pk1_value
         tests:
           - relationships:
-              to: ref('stg_erp__fnd_vs_values_b')
+              to: ref('base_erp__fnd_vs_values_b')
               field: value
       - name: dep29_pk2_value
         tests:
           - relationships:
-              to: ref('stg_erp__fnd_vs_values_b')
+              to: ref('base_erp__fnd_vs_values_b')
               field: attribute_category
       - name: dep30_pk1_value
         tests:
           - relationships:
-              to: ref('stg_erp__fnd_vs_values_b')
+              to: ref('base_erp__fnd_vs_values_b')
               field: value
       - name: dep30_pk2_value
         tests:
           - relationships:
-              to: ref('stg_erp__fnd_vs_values_b')
+              to: ref('base_erp__fnd_vs_values_b')
               field: attribute_category
+  - name: stg_erp__cost_center_trees
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - tree_version_name
+            - cost_center_code
