@@ -25,3 +25,5 @@ select
     dep30_pk2_value
 
 from source
+
+where tree_code in ('COA_BC', 'COA_FUND', 'COA_BCAT', 'COA_CC')

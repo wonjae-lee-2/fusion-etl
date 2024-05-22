@@ -1,12 +1,15 @@
 version: 2
 
 groups:
-  - name: stg_dbt
+  - name: stg_rdp
     owner:
       name: dbt_core
-  - name: int_dbt
+  - name: stg_erp
     owner:
       name: dbt_core
-  - name: dw_dbt
+  - name: int
+    owner:
+      name: dbt_core
+  - name: dw
     owner:
       name: dbt_core

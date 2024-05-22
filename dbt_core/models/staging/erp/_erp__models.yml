@@ -80,3 +80,32 @@ models:
           combination_of_columns:
             - tree_version_name
             - cost_center_code
+  - name: stg_erp__account_trees
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - tree_version_name
+            - account_code
+  - name: stg_erp__account_group_trees
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - tree_version_name
+            - account_group_code
+  - name: stg_erp__budget_category_trees
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - tree_version_name
+            - budget_category_code
+  - name: stg_erp__fund_trees
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - tree_version_name
+            - fund_code
+  - name: stg_erp__budget_situations
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - budget_situation_code

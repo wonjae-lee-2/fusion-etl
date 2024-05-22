@@ -32,5 +32,9 @@ models:
   dbt_core:
     # Config indicated by + and applies to all files under models/example/
     staging:
-      +group: stg_dbt
       +materialized: view
+
+      rdp:
+        +group: stg_rdp
+      erp:
+        +group: stg_erp

@@ -13,3 +13,12 @@ select
     description
 
 from source
+
+where
+    attribute_category in (
+        'HCR_COA_ACCOUNT',
+        'HCR_COA_FUND',
+        'HCR_COA_BUDGETCATEGORY',
+        'HCR_COA_COSTCENTER',
+        'HCR_Budget_Situation'
+    )
