@@ -2,19 +2,27 @@ with
 
 apportioned_budget_lines as (
 
-    select * from {{ ref('base_rdp__apportioned_budget_lines') }}
+    select
+        apportioned_budget_line_id,
+        budget_year,
+        abc_code,
+        strategy_code,
+        budget_version,
+        scenario,
+        cost_center,
+        budget_category,
+        output_statement_id,
+        usd_amount,
+        strategy_validity_key
+
+    from {{ ref('base_rdp__apportioned_budget_lines') }}
 ),
 
 strategy_validities as (
 
-    select * from {{ ref('base_rdp__strategy_validities') }}
-),
+    select strategy_validity_key
 
-output_statements as (
-
-    select distinct output_statement_id
-
-    from {{ ref('base_rdp__output_statements') }}
+    from {{ ref('base_rdp__strategy_validities') }}
 
 ),
 
@@ -24,11 +32,9 @@ output_statement_validities as (
 
     from {{ ref('base_rdp__output_statement_validities') }}
 
-    where is_excluded = 1
+    where is_excluded = 0
 
 )
-
-
 
 select
     apportioned_budget_lines.apportioned_budget_line_id,
@@ -49,15 +55,7 @@ inner join strategy_validities
         apportioned_budget_lines.strategy_validity_key
         = strategy_validities.strategy_validity_key
 
-inner join output_statements
-    on
-        apportioned_budget_lines.output_statement_id
-        = output_statements.output_statement_id
-
-left join output_statement_validities
+inner join output_statement_validities
     on
         apportioned_budget_lines.output_statement_id
         = output_statement_validities.output_statement_id
-
-where
-    output_statement_validities.output_statement_id is null
