@@ -9,4 +9,9 @@ ERP_MAPPINGS = [
         "source": "GL_SEG_VAL_HIER_CF",
         "target": "[erp].[GL_SEG_VAL_HIER_CF]",
     },
+    {
+        "name": "XCC_BALANCE_ACTIVITIES_24",
+        "source": "XCC_BALANCE_ACTIVITIES_24",
+        "target": "[erp].[XCC_BALANCE_ACTIVITIES_24]",
+    },
 ]
