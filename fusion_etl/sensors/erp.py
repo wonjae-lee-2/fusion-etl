@@ -103,11 +103,11 @@ def _check_output_ids(
     return True
 
 
-def _get_first_job_timestamp(erp_timestamp: dict[str, dict[str, str]]) -> str:
+def _get_last_job_timestamp(erp_timestamp: dict[str, dict[str, str]]) -> str:
     job_timestamps = [x["job_timestamp"] for x in erp_timestamp.values()]
-    first_job_timestamp = min(job_timestamps)
+    last_job_timestamp = max(job_timestamps)
 
-    return first_job_timestamp
+    return last_job_timestamp
 
 
 @sensor(job=erp_job, minimum_interval_seconds=60 * 60)
@@ -129,9 +129,9 @@ def erp_timestamp_sensor(
         with open(timestamps_path, "w") as f:
             json.dump(timestamps, f)
 
-        first_job_timestamp = _get_first_job_timestamp(current_erp_timestamp)
+        last_job_timestamp = _get_last_job_timestamp(current_erp_timestamp)
 
-        return RunRequest(run_key=first_job_timestamp)
+        return RunRequest(run_key=last_job_timestamp)
     else:
         return SkipReason(
             "Some or all jobs have not yet run again, so their output IDs have not changed"
@@ -146,6 +146,6 @@ def erp_timestamp_sensor(
 def erp_run_status_sensor(context: RunStatusSensorContext) -> RunRequest:
     timestamps = _read_timestamps()
     erp_timestamp = timestamps.get("erp")
-    first_job_timestamp = _get_first_job_timestamp(erp_timestamp)
+    last_job_timestamp = _get_last_job_timestamp(erp_timestamp)
 
-    return RunRequest(run_key=first_job_timestamp)
+    return RunRequest(run_key=last_job_timestamp)
