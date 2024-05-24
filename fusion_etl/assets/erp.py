@@ -63,7 +63,7 @@ def define_blob_erp_asset(
         key_prefix="erp",
         group_name="blob_erp",
         name=asset_name,
-        compute_kind="python",
+        compute_kind="azure",
     )
     def _blob_erp_asset(
         erp_resource: ERPResource,

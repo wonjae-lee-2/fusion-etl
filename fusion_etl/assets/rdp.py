@@ -44,7 +44,7 @@ def define_blob_rdp_asset(
         key_prefix="rdp",
         group_name="blob_rdp",
         name=asset_name,
-        compute_kind="python",
+        compute_kind="azure",
     )
     def _blob_rdp_asset(
         rdp_resource: RDPResource,
