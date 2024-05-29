@@ -10,8 +10,9 @@ dbt_job = define_asset_job(
     selection=AssetSelection.key_prefixes("dbt"),
     tags={"target_prefix": "dbt"},
 )
-erp_job = define_asset_job(
-    "erp_job",
-    selection=AssetSelection.key_prefixes("erp"),
+erp_active_job = define_asset_job(
+    "erp_active_job",
+    selection=AssetSelection.key_prefixes("erp")
+    & AssetSelection.tag("status", "active"),
     tags={"target_prefix": "erp"},
 )

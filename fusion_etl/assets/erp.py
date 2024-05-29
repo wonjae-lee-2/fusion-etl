@@ -64,6 +64,7 @@ def define_blob_erp_asset(
         group_name="blob_erp",
         name=asset_name,
         compute_kind="azure",
+        tags={"status": erp_mapping["status"]},
     )
     def _blob_erp_asset(
         erp_resource: ERPResource,
@@ -135,6 +136,7 @@ def define_src_erp_asset(
         name=asset_name,
         compute_kind="sql",
         deps=[["erp", upstream_asset_name]],
+        tags={"status": erp_mapping["status"]},
     )
     def _src_erp_asset(
         fusion_resource: FusionResource,

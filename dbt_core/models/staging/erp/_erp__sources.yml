@@ -5,5 +5,18 @@ sources:
     database: fusion
     schema: erp
     tables:
+      - name: FND_LOOKUP_VALUES_TL
       - name: FND_VS_VALUES_B
+      - name: GL_CODE_COMBINATIONS
       - name: GL_SEG_VAL_HIER_CF
+      - name: HR_ALL_ORGANIZATION_UNITS_F
+      - name: PJF_EXP_TYPES_B
+      - name: PJF_PROJ_ELEMENTS_B
+      - name: PJF_PROJECTS_ALL_B
+      - name: PJF_TXN_DOCUMENT_B
+      - name: PJF_TXN_SOURCES_B
+      - name: POZ_SUPPLIERS
+      - name: XCC_BALANCE_ACTIVITIES_22
+      - name: XCC_BALANCE_ACTIVITIES_23
+      - name: XCC_BALANCE_ACTIVITIES_24
+      - name: XCC_BUDGET_ACCOUNTS

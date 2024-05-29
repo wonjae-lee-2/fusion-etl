@@ -17,7 +17,7 @@ from dagster import (
 from playwright.sync_api import Cookie
 
 from ..assets.erp_mappings import ERP_MAPPINGS
-from ..jobs import dbt_job, erp_job
+from ..jobs import dbt_job, erp_active_job
 from ..resources.erp import ERPResource
 
 timestamps_path = (
@@ -32,6 +32,7 @@ erp_cookies_path = (
 )
 job_info_url = EnvVar("JOB_INFO_URL").get_value()
 output_info_url = EnvVar("OUTPUT_INFO_URL").get_value()
+active_erp_mappings = [x for x in ERP_MAPPINGS if x["status"] == "active"]
 
 
 def _read_timestamps() -> dict:
@@ -61,11 +62,11 @@ def _format_job_datetime(job_datetime: int) -> str:
 
 def _get_erp_timestamp(
     erp_cookies: list[Cookie],
-    erp_mappings: list[dict[str, str]],
+    active_erp_mappings: list[dict[str, str]],
 ) -> dict[str, dict[str, str]]:
     output_timestamps = {}
 
-    for erp_mapping in erp_mappings:
+    for erp_mapping in active_erp_mappings:
         print(f"getting timestamp for {erp_mapping['source']}")
         session = requests.Session()
         for cookie in erp_cookies:
@@ -110,14 +111,14 @@ def _get_last_output_id(erp_timestamp: dict[str, dict[str, str]]) -> str:
     return last_output_id
 
 
-@sensor(job=erp_job, minimum_interval_seconds=60 * 60)
+@sensor(job=erp_active_job, minimum_interval_seconds=60 * 60)
 def erp_timestamp_sensor(
     context: SensorEvaluationContext, erp_resource: ERPResource
 ) -> RunRequest | SkipReason:
     timestamps = _read_timestamps()
     previous_erp_timestamp = timestamps.get("erp")
     erp_cookies = erp_resource.refresh_cookies()
-    current_erp_timestamp = _get_erp_timestamp(erp_cookies, ERP_MAPPINGS)
+    current_erp_timestamp = _get_erp_timestamp(erp_cookies, active_erp_mappings)
     all_output_ids_changed = _check_output_ids(
         previous_erp_timestamp,
         current_erp_timestamp,
@@ -140,7 +141,7 @@ def erp_timestamp_sensor(
 
 @run_status_sensor(
     run_status=DagsterRunStatus.SUCCESS,
-    monitored_jobs=[erp_job],
+    monitored_jobs=[erp_active_job],
     request_job=dbt_job,
 )
 def erp_run_status_sensor(context: RunStatusSensorContext) -> RunRequest:

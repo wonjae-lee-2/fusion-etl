@@ -1,17 +1,92 @@
 ERP_MAPPINGS = [
     {
+        "name": "FND_LOOKUP_VALUES_TL",
+        "status": "active",
+        "source": "FND_LOOKUP_VALUES_TL",
+        "target": "[erp].[FND_LOOKUP_VALUES_TL]",
+    },
+    {
         "name": "FND_VS_VALUES_B",
+        "status": "active",
         "source": "FND_VS_VALUES_B",
         "target": "[erp].[FND_VS_VALUES_B]",
     },
     {
+        "name": "GL_CODE_COMBINATIONS",
+        "status": "active",
+        "source": "GL_CODE_COMBINATIONS",
+        "target": "[erp].[GL_CODE_COMBINATIONS]",
+    },
+    {
         "name": "GL_SEG_VAL_HIER_CF",
+        "status": "active",
         "source": "GL_SEG_VAL_HIER_CF",
         "target": "[erp].[GL_SEG_VAL_HIER_CF]",
     },
     {
+        "name": "HR_ALL_ORGANIZATION_UNITS_F",
+        "status": "active",
+        "source": "HR_ALL_ORGANIZATION_UNITS_F",
+        "target": "[erp].[HR_ALL_ORGANIZATION_UNITS_F]",
+    },
+    {
+        "name": "PJF_EXP_TYPES_B",
+        "status": "active",
+        "source": "PJF_EXP_TYPES_B",
+        "target": "[erp].[PJF_EXP_TYPES_B]",
+    },
+    {
+        "name": "PJF_PROJ_ELEMENTS_B",
+        "status": "active",
+        "source": "PJF_PROJ_ELEMENTS_B",
+        "target": "[erp].[PJF_PROJ_ELEMENTS_B]",
+    },
+    {
+        "name": "PJF_PROJECTS_ALL_B",
+        "status": "active",
+        "source": "PJF_PROJECTS_ALL_B",
+        "target": "[erp].[PJF_PROJECTS_ALL_B]",
+    },
+    {
+        "name": "PJF_TXN_DOCUMENT_B",
+        "status": "active",
+        "source": "PJF_TXN_DOCUMENT_B",
+        "target": "[erp].[PJF_TXN_DOCUMENT_B]",
+    },
+    {
+        "name": "PJF_TXN_SOURCES_B",
+        "status": "active",
+        "source": "PJF_TXN_SOURCES_B",
+        "target": "[erp].[PJF_TXN_SOURCES_B]",
+    },
+    {
+        "name": "POZ_SUPPLIERS",
+        "status": "active",
+        "source": "POZ_SUPPLIERS",
+        "target": "[erp].[POZ_SUPPLIERS]",
+    },
+    {
+        "name": "XCC_BALANCE_ACTIVITIES_22",
+        "status": "inactive",
+        "source": "XCC_BALANCE_ACTIVITIES_22",
+        "target": "[erp].[XCC_BALANCE_ACTIVITIES_22]",
+    },
+    {
+        "name": "XCC_BALANCE_ACTIVITIES_23",
+        "status": "inactive",
+        "source": "XCC_BALANCE_ACTIVITIES_23",
+        "target": "[erp].[XCC_BALANCE_ACTIVITIES_23]",
+    },
+    {
         "name": "XCC_BALANCE_ACTIVITIES_24",
+        "status": "active",
         "source": "XCC_BALANCE_ACTIVITIES_24",
         "target": "[erp].[XCC_BALANCE_ACTIVITIES_24]",
+    },
+    {
+        "name": "XCC_BUDGET_ACCOUNTS",
+        "status": "active",
+        "source": "XCC_BUDGET_ACCOUNTS",
+        "target": "[erp].[XCC_BUDGET_ACCOUNTS]",
     },
 ]
