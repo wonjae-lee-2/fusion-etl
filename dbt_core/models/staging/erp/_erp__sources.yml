@@ -10,6 +10,7 @@ sources:
       - name: GL_CODE_COMBINATIONS
       - name: GL_SEG_VAL_HIER_CF
       - name: HR_ALL_ORGANIZATION_UNITS_F
+      - name: PJF_EXP_CATEGORIES_TL
       - name: PJF_EXP_TYPES_B
       - name: PJF_PROJ_ELEMENTS_B
       - name: PJF_PROJECTS_ALL_B

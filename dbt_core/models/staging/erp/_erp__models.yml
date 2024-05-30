@@ -97,12 +97,24 @@ models:
           - unique
           - not_null
 
+  - name: base_erp__pjf_exp_categories_tl
+    columns:
+      - name: expenditure_category_id
+        tests:
+          - unique
+          - not_null
+
   - name: base_erp__pjf_exp_types_b
     columns:
       - name: expenditure_type_id
         tests:
           - unique
           - not_null
+      - name: expenditure_category_id
+        tests:
+          - relationships:
+              to: ref('base_erp__pjf_exp_categories_tl')
+              field: expenditure_category_id
 
   - name: base_erp__pjf_proj_elements_b
     columns:
@@ -204,11 +216,11 @@ models:
           - relationships:
               to: ref('base_erp__pjf_txn_document_b')
               field: document_code
-      - name: budget_segment_id
+      - name: bc_segment_id
         tests:
           - relationships:
               to: ref('base_erp__xcc_budget_accounts')
-              field: budget_segment_id
+              field: bc_segment_id
       - name: gl_segment_id
         tests:
           - relationships:
@@ -292,11 +304,11 @@ models:
           - relationships:
               to: ref('base_erp__pjf_txn_document_b')
               field: document_code
-      - name: budget_segment_id
+      - name: bc_segment_id
         tests:
           - relationships:
               to: ref('base_erp__xcc_budget_accounts')
-              field: budget_segment_id
+              field: bc_segment_id
       - name: gl_segment_id
         tests:
           - relationships:
@@ -380,11 +392,11 @@ models:
           - relationships:
               to: ref('base_erp__pjf_txn_document_b')
               field: document_code
-      - name: budget_segment_id
+      - name: bc_segment_id
         tests:
           - relationships:
               to: ref('base_erp__xcc_budget_accounts')
-              field: budget_segment_id
+              field: bc_segment_id
       - name: gl_segment_id
         tests:
           - relationships:
@@ -418,7 +430,7 @@ models:
 
   - name: base_erp__xcc_budget_accounts
     columns:
-      - name: budget_segment_id
+      - name: bc_segment_id
         tests:
           - unique
           - not_null

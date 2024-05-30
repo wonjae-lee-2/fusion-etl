@@ -6,7 +6,7 @@ source as (
 
 )
 
-select
+select distinct
     job_utc_timestamp,
     attribute_category,
     value,

@@ -31,14 +31,14 @@ ppm_documents as (
 
 ),
 
-budget_segments as (
+bc_segments as (
 
     select
-        budget_segment_id,
-        budget_segment1,
-        budget_segment2,
-        budget_segment3,
-        budget_segment4
+        bc_segment_id,
+        bc_fund_code,
+        bc_cost_center_code,
+        bc_account_group_code,
+        bc_budget_category_group_code
 
     from {{ ref('base_erp__xcc_budget_accounts') }}
 
@@ -48,11 +48,11 @@ gl_segments as (
 
     select
         gl_segment_id,
-        gl_segment1,
-        gl_segment2,
-        gl_segment3,
-        gl_segment4,
-        gl_segment5
+        gl_fund_code,
+        gl_cost_center_code,
+        gl_account_code,
+        gl_budget_category_code,
+        gl_interfund_code
 
     from {{ ref('base_erp__gl_code_combinations') }}
 
@@ -97,10 +97,40 @@ expenditure_types as (
 
     select
         expenditure_type_id,
+        expenditure_category_id,
         expenditure_type_code,
         expenditure_type
 
     from {{ ref('base_erp__pjf_exp_types_b') }}
+
+),
+
+expenditure_categories as (
+
+    select
+        expenditure_category_id,
+        expenditure_category_code,
+        expenditure_category
+
+    from {{ ref('base_erp__pjf_exp_categories_tl') }}
+
+),
+
+expenditure_categories_types as (
+
+    select
+        expenditure_types.expenditure_type_id,
+        expenditure_types.expenditure_type_code,
+        expenditure_types.expenditure_type,
+        expenditure_categories.expenditure_category_code,
+        expenditure_categories.expenditure_category
+
+    from expenditure_types
+
+    left join expenditure_categories
+        on
+            expenditure_types.expenditure_category_id
+            = expenditure_categories.expenditure_category_id
 
 ),
 
@@ -135,19 +165,15 @@ activities_22 as (
         gl_category_code,
         ppm_source_code,
         ppm_document_code,
-        budget_segment_id,
+        bc_segment_id,
         gl_segment_id,
         vendor_id,
-        source_line_id_1,
-        source_line_id_2,
-        source_line_id_3,
-        liquidation_line_id_1,
-        liquidation_line_id_2,
-        liquidation_line_id_3,
         pjc_project_id,
         pjc_task_id,
         pjc_expenditure_type_id,
         pjc_organization_id,
+        source_line_id,
+        liquidation_line_id,
         entered_currency,
         entered_amount,
         usd_amount
@@ -175,19 +201,15 @@ activities_23 as (
         gl_category_code,
         ppm_source_code,
         ppm_document_code,
-        budget_segment_id,
+        bc_segment_id,
         gl_segment_id,
         vendor_id,
-        source_line_id_1,
-        source_line_id_2,
-        source_line_id_3,
-        liquidation_line_id_1,
-        liquidation_line_id_2,
-        liquidation_line_id_3,
         pjc_project_id,
         pjc_task_id,
         pjc_expenditure_type_id,
         pjc_organization_id,
+        source_line_id,
+        liquidation_line_id,
         entered_currency,
         entered_amount,
         usd_amount
@@ -216,19 +238,15 @@ activities_24 as (
         gl_category_code,
         ppm_source_code,
         ppm_document_code,
-        budget_segment_id,
+        bc_segment_id,
         gl_segment_id,
         vendor_id,
-        source_line_id_1,
-        source_line_id_2,
-        source_line_id_3,
-        liquidation_line_id_1,
-        liquidation_line_id_2,
-        liquidation_line_id_3,
         pjc_project_id,
         pjc_task_id,
         pjc_expenditure_type_id,
         pjc_organization_id,
+        source_line_id,
+        liquidation_line_id,
         entered_currency,
         entered_amount,
         usd_amount
@@ -266,33 +284,31 @@ select
     activities.gl_category_code,
     ppm_sources.source_name as ppm_source,
     ppm_documents.document_name as ppm_document,
-    budget_segments.budget_segment1,
-    budget_segments.budget_segment2,
-    budget_segments.budget_segment3,
-    budget_segments.budget_segment4,
-    gl_segments.gl_segment1,
-    gl_segments.gl_segment2,
-    gl_segments.gl_segment3,
-    gl_segments.gl_segment4,
-    gl_segments.gl_segment5,
+    bc_segments.bc_fund_code,
+    bc_segments.bc_cost_center_code,
+    bc_segments.bc_account_group_code,
+    bc_segments.bc_budget_category_group_code,
+    gl_segments.gl_fund_code,
+    gl_segments.gl_cost_center_code,
+    gl_segments.gl_account_code,
+    gl_segments.gl_budget_category_code,
+    gl_segments.gl_interfund_code,
     suppliers.supplier_number,
     suppliers.supplier_name,
     suppliers.supplier_type,
     suppliers.supplier_business_classification,
-    activities.source_line_id_1,
-    activities.source_line_id_2,
-    activities.source_line_id_3,
-    activities.liquidation_line_id_1,
-    activities.liquidation_line_id_2,
-    activities.liquidation_line_id_3,
     projects.project_number,
     projects.project_name,
     tasks.task_number,
     tasks.task_name,
-    expenditure_types.expenditure_type_code,
-    expenditure_types.expenditure_type,
+    expenditure_categories_types.expenditure_category_code,
+    expenditure_categories_types.expenditure_category,
+    expenditure_categories_types.expenditure_type_code,
+    expenditure_categories_types.expenditure_type,
     expenditure_organizations.expenditure_organization,
     expenditure_organizations.expenditure_organization_description,
+    activities.source_line_id,
+    activities.liquidation_line_id,
     activities.entered_currency,
     activities.entered_amount,
     activities.usd_amount
@@ -350,8 +366,8 @@ left join ppm_sources
 left join ppm_documents
     on activities.ppm_document_code = ppm_documents.document_code
 
-left join budget_segments
-    on activities.budget_segment_id = budget_segments.budget_segment_id
+left join bc_segments
+    on activities.bc_segment_id = bc_segments.bc_segment_id
 
 left join gl_segments
     on activities.gl_segment_id = gl_segments.gl_segment_id
@@ -365,10 +381,10 @@ left join projects
 left join tasks
     on activities.pjc_task_id = tasks.task_id
 
-left join expenditure_types
+left join expenditure_categories_types
     on
         activities.pjc_expenditure_type_id
-        = expenditure_types.expenditure_type_id
+        = expenditure_categories_types.expenditure_type_id
 
 left join expenditure_organizations
     on

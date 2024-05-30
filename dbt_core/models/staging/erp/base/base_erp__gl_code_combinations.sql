@@ -9,10 +9,10 @@ source as (
 select
     job_utc_timestamp,
     code_combination_id as gl_segment_id,
-    segment1 as gl_segment1,
-    segment2 as gl_segment2,
-    segment3 as gl_segment3,
-    segment4 as gl_segment4,
-    segment5 as gl_segment5
+    segment1 as gl_fund_code,
+    segment2 as gl_cost_center_code,
+    segment3 as gl_account_code,
+    segment4 as gl_budget_category_code,
+    segment5 as gl_interfund_code
 
 from source

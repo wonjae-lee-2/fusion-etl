@@ -5,7 +5,7 @@ source as (
     select * from {{ source('erp', 'HR_ALL_ORGANIZATION_UNITS_F') }}
 )
 
-select
+select distinct
     job_utc_timestamp,
     organization_id,
     name as organization_name,

@@ -30,6 +30,12 @@ ERP_MAPPINGS = [
         "target": "[erp].[HR_ALL_ORGANIZATION_UNITS_F]",
     },
     {
+        "name": "PJF_EXP_CATEGORIES_TL",
+        "status": "active",
+        "source": "PJF_EXP_CATEGORIES_TL",
+        "target": "[erp].[PJF_EXP_CATEGORIES_TL]",
+    },
+    {
         "name": "PJF_EXP_TYPES_B",
         "status": "active",
         "source": "PJF_EXP_TYPES_B",

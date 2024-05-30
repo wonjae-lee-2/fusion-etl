@@ -6,7 +6,7 @@ source as (
 
 )
 
-select
+select distinct
     job_utc_timestamp,
     tree_code,
     tree_version_name,
