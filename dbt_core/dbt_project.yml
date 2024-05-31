@@ -35,6 +35,6 @@ models:
       +materialized: view
 
       rdp:
-        +group: stg_rdp
+        +group: rdp_stg
       erp:
-        +group: stg_erp
+        +group: erp_stg

@@ -34,19 +34,19 @@ def _get_rdp_timestamp_date() -> str:
     return rdp_timestamp[:10]
 
 
-def define_blob_rdp_asset(
+def define_rdp_blob_asset(
     rdp_mapping: dict[str, str],
     dagster_env: EnvVar,
 ) -> AssetsDefinition:
-    asset_name = f"blob_rdp__{rdp_mapping['name']}"
+    asset_name = f"rdp_blob__{rdp_mapping['name']}"
 
     @asset(
         key_prefix="rdp",
-        group_name="blob_rdp",
+        group_name="rdp_blob",
         name=asset_name,
         compute_kind="azure",
     )
-    def _blob_rdp_asset(
+    def _rdp_blob_asset(
         rdp_resource: RDPResource,
         azure_blob_resource: AzureBlobResource,
     ) -> MaterializeResult:
@@ -102,24 +102,24 @@ def define_blob_rdp_asset(
             }
         )
 
-    return _blob_rdp_asset
+    return _rdp_blob_asset
 
 
-def define_src_rdp_asset(
+def define_rdp_src_asset(
     rdp_mapping: dict[str, str],
     dagster_env: EnvVar,
 ) -> AssetsDefinition:
-    asset_name = f"src_rdp__{rdp_mapping['name']}"
-    upstream_asset_name = f"blob_rdp__{rdp_mapping['name']}"
+    asset_name = f"rdp_src__{rdp_mapping['name']}"
+    upstream_asset_name = f"rdp_blob__{rdp_mapping['name']}"
 
     @asset(
         key_prefix="rdp",
-        group_name="src_rdp",
+        group_name="rdp_src",
         name=asset_name,
         compute_kind="sql",
         deps=[["rdp", upstream_asset_name]],
     )
-    def _src_rdp_asset(
+    def _rdp_src_asset(
         fusion_resource: FusionResource,
     ) -> MaterializeResult:
         target_table = rdp_mapping["target"]
@@ -139,4 +139,4 @@ def define_src_rdp_asset(
 
         return MaterializeResult(metadata={"Table Name": rdp_mapping["target"]})
 
-    return _src_rdp_asset
+    return _rdp_src_asset

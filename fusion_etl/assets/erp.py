@@ -53,20 +53,20 @@ def _read_output_timestamp(
     return (output_id, job_timestamp)
 
 
-def define_blob_erp_asset(
+def define_erp_blob_asset(
     erp_mapping: dict[str, str],
     dagster_env: EnvVar,
 ) -> AssetsDefinition:
-    asset_name = f"blob_erp__{erp_mapping['name']}"
+    asset_name = f"erp_blob__{erp_mapping['name']}"
 
     @asset(
         key_prefix="erp",
-        group_name="blob_erp",
+        group_name="erp_blob",
         name=asset_name,
         compute_kind="azure",
         tags={"status": erp_mapping["status"]},
     )
-    def _blob_erp_asset(
+    def _erp_blob_asset(
         erp_resource: ERPResource,
         azure_blob_resource: AzureBlobResource,
     ) -> MaterializeResult:
@@ -120,25 +120,25 @@ def define_blob_erp_asset(
             }
         )
 
-    return _blob_erp_asset
+    return _erp_blob_asset
 
 
-def define_src_erp_asset(
+def define_erp_src_asset(
     erp_mapping: dict[str, str],
     dagster_env: EnvVar,
 ) -> AssetsDefinition:
-    asset_name = f"src_erp__{erp_mapping['name']}"
-    upstream_asset_name = f"blob_erp__{erp_mapping['name']}"
+    asset_name = f"erp_src__{erp_mapping['name']}"
+    upstream_asset_name = f"erp_blob__{erp_mapping['name']}"
 
     @asset(
         key_prefix="erp",
-        group_name="src_erp",
+        group_name="erp_src",
         name=asset_name,
         compute_kind="sql",
         deps=[["erp", upstream_asset_name]],
         tags={"status": erp_mapping["status"]},
     )
-    def _src_erp_asset(
+    def _erp_src_asset(
         fusion_resource: FusionResource,
     ) -> MaterializeResult:
         target_table = erp_mapping["target"]
@@ -159,4 +159,4 @@ def define_src_erp_asset(
 
         return MaterializeResult(metadata={"Table Name": erp_mapping["target"]})
 
-    return _src_erp_asset
+    return _erp_src_asset
