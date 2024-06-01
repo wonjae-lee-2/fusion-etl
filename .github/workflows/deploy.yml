@@ -33,6 +33,10 @@ jobs:
           JOB_INFO_URL: ${{ secrets.JOB_INFO_URL}}
           OUTPUT_INFO_URL: ${{ secrets.OUTPUT_INFO_URL}}
           OUTPUT_DOWNLOAD_URL: ${{ secrets.OUTPUT_DOWNLOAD_URL}}
+          MSRP_SERVER: ${{ secrets.MSRP_SERVER}}
+          MSRP_DATABASE: ${{ secrets.MSRP_DATABASE}}
+          MSRP_LOGIN: ${{ secrets.MSRP_LOGIN}}
+          MSRP_PASSWORD: ${{ secrets.MSRP_PASSWORD}}
         run: |
           Set-Content -Path .env -Value "AZURE_DATABASE_CREDENTIAL_SCOPE=$env:AZURE_DATABASE_CREDENTIAL_SCOPE"
           Add-Content -Path .env -Value "ODBC_DRIVER=$env:ODBC_DRIVER"
@@ -50,6 +54,10 @@ jobs:
           Add-Content -Path .env -Value "JOB_INFO_URL=$env:JOB_INFO_URL"
           Add-Content -Path .env -Value "OUTPUT_INFO_URL=$env:OUTPUT_INFO_URL"
           Add-Content -Path .env -Value "OUTPUT_DOWNLOAD_URL=$env:OUTPUT_DOWNLOAD_URL"
+          Add-Content -Path .env -Value "MSRP_SERVER=$env:MSRP_SERVER"
+          Add-Content -Path .env -Value "MSRP_DATABASE=$env:MSRP_DATABASE"
+          Add-Content -Path .env -Value "MSRP_LOGIN=$env:MSRP_LOGIN"
+          Add-Content -Path .env -Value "MSRP_PASSWORD=$env:MSRP_PASSWORD"
 
       - name: Write azure cli credentials to file
         shell: pwsh
