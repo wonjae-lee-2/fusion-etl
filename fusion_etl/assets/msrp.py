@@ -24,31 +24,17 @@ def define_msrp_blob_asset(
         msrp_resource: MSRPResource,
         azure_blob_resource: AzureBlobResource,
     ) -> MaterializeResult:
-        def _query_msrp(msrp_resource: MSRPResource) -> list[tuple[int | str, ...]]:
-            source_table = msrp_mapping["source"]
-            sql = f"""
-                SELECT * FROM {source_table};
-            """
-
-            with msrp_resource.connect() as conn:
-                with conn.cursor() as cursor:
-                    cursor.execute(sql)
-                    header = tuple(column[0] for column in cursor.description)
-                    rows = cursor.fetchall()
-                    rows_with_header = [header] + rows
-
-            return rows_with_header
-
         def _upload_blob(
             azure_blob_resource: AzureBlobResource,
-            rows_with_header: list[tuple[int | str, ...]],
+            rows: list[tuple[int | str, ...]],
+            overwrite_flag: bool,
         ) -> tuple[str | None, str]:
             container_name = dagster_env.get_value()
             blob_name = f"msrp/{asset_name}.csv"
 
             with io.StringIO(newline="") as buffer:
                 writer = csv.writer(buffer)
-                writer.writerows(rows_with_header)
+                writer.writerows(rows)
                 blob_client = (
                     azure_blob_resource.get_blob_service_client().get_blob_client(
                         container=container_name,
@@ -57,16 +43,38 @@ def define_msrp_blob_asset(
                 )
                 blob_client.upload_blob(
                     buffer.getvalue(),
+                    blob_type="AppendBlob",
                     encoding="utf-8",
-                    overwrite=True,
+                    overwrite=overwrite_flag,
                 )
 
             return (container_name, blob_name)
 
-        rows_with_header = _query_msrp(msrp_resource)
-        (container_name, blob_name) = _upload_blob(
-            azure_blob_resource, rows_with_header
-        )
+        def _sync_msrp(msrp_resource: MSRPResource) -> tuple[str | None, str]:
+            source_table = msrp_mapping["source"]
+            sql = f"""
+                SELECT * FROM {source_table};
+            """
+            rows_to_fetch = 500_000
+
+            with msrp_resource.connect() as conn:
+                with conn.cursor() as cursor:
+                    cursor.execute(sql)
+                    header = tuple(column[0] for column in cursor.description)
+                    (container_name, blob_name) = _upload_blob(
+                        azure_blob_resource,
+                        [header],
+                        True,
+                    )
+                    while True:
+                        rows = cursor.fetchmany(rows_to_fetch)
+                        if not rows:
+                            break
+                        _upload_blob(azure_blob_resource, rows, False)
+
+            return (container_name, blob_name)
+
+        (container_name, blob_name) = _sync_msrp(msrp_resource)
 
         return MaterializeResult(
             metadata={
