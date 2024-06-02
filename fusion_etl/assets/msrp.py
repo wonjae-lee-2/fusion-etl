@@ -55,7 +55,7 @@ def define_msrp_blob_asset(
             sql = f"""
                 SELECT * FROM {source_table};
             """
-            rows_to_fetch = 500_000
+            rows_to_fetch = 100_000
 
             with msrp_resource.connect() as conn:
                 with conn.cursor() as cursor:
