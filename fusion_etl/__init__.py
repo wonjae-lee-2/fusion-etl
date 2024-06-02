@@ -8,6 +8,7 @@ from .assets.msrp import define_msrp_blob_asset, define_msrp_src_asset
 from .assets.msrp_mappings import MSRP_MAPPINGS
 from .assets.rdp import define_rdp_blob_asset, define_rdp_src_asset
 from .assets.rdp_mappings import RDP_MAPPINGS
+from .jobs import erp_all_job
 from .resources.azure import AzureBlobResource
 from .resources.erp import ERPResource
 from .resources.fusion import FusionResource
@@ -98,4 +99,5 @@ defs = Definitions(
         erp_active_timestamp_sensor,
         erp_active_run_status_sensor,
     ],
+    jobs=[erp_all_job],
 )
