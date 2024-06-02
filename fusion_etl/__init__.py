@@ -13,7 +13,7 @@ from .resources.erp import ERPResource
 from .resources.fusion import FusionResource
 from .resources.msrp import MSRPResource
 from .resources.rdp import RDPResource
-from .sensors.erp import erp_run_status_sensor, erp_timestamp_sensor
+from .sensors.erp import erp_active_run_status_sensor, erp_active_timestamp_sensor
 from .sensors.rdp import rdp_run_status_sensor, rdp_timestamp_sensor
 
 erp_blob_assets = [
@@ -95,7 +95,7 @@ defs = Definitions(
     sensors=[
         rdp_timestamp_sensor,
         rdp_run_status_sensor,
-        erp_timestamp_sensor,
-        erp_run_status_sensor,
+        erp_active_timestamp_sensor,
+        erp_active_run_status_sensor,
     ],
 )

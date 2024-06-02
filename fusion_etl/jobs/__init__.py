@@ -14,5 +14,10 @@ erp_active_job = define_asset_job(
     "erp_active_job",
     selection=AssetSelection.key_prefixes("erp")
     & AssetSelection.tag("status", "active"),
+    tags={"target_prefix": "erp", "target_tag": "active"},
+)
+erp_all_job = define_asset_job(
+    "erp_all_job",
+    selection=AssetSelection.key_prefixes("erp"),
     tags={"target_prefix": "erp"},
 )

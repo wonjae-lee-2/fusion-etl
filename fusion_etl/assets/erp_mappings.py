@@ -79,7 +79,7 @@ ERP_MAPPINGS = [
     },
     {
         "name": "XCC_BALANCE_ACTIVITIES_23",
-        "status": "inactive",
+        "status": "active",
         "source": "XCC_BALANCE_ACTIVITIES_23",
         "target": "[erp].[XCC_BALANCE_ACTIVITIES_23]",
     },

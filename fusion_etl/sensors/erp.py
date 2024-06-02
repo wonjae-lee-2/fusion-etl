@@ -62,11 +62,11 @@ def _format_job_datetime(job_datetime: int) -> str:
 
 def _get_erp_timestamp(
     erp_cookies: list[Cookie],
-    active_erp_mappings: list[dict[str, str]],
+    erp_mappings: list[dict[str, str]],
 ) -> dict[str, dict[str, str]]:
     output_timestamps = {}
 
-    for erp_mapping in active_erp_mappings:
+    for erp_mapping in erp_mappings:
         print(f"getting timestamp for {erp_mapping['source']}")
         session = requests.Session()
         for cookie in erp_cookies:
@@ -82,6 +82,7 @@ def _get_erp_timestamp(
         output_timestamps[erp_mapping["source"]] = {
             "output_id": output_id,
             "job_timestamp": formatted_job_datetime,
+            "status": erp_mapping["status"],
         }
         print("... done")
 
@@ -96,8 +97,12 @@ def _check_output_ids(
         return True
 
     previous_output_ids = [x["output_id"] for x in previous_erp_timestamp.values()]
-    current_output_ids = [x["output_id"] for x in current_erp_timestamp.values()]
-    for output_id in current_output_ids:
+    current_active_output_ids = [
+        x["output_id"]
+        for x in current_erp_timestamp.values()
+        if x["status"] == "active"
+    ]
+    for output_id in current_active_output_ids:
         if output_id in previous_output_ids:
             return False
 
@@ -112,13 +117,13 @@ def _get_last_output_id(erp_timestamp: dict[str, dict[str, str]]) -> str:
 
 
 @sensor(job=erp_active_job, minimum_interval_seconds=60 * 60)
-def erp_timestamp_sensor(
+def erp_active_timestamp_sensor(
     context: SensorEvaluationContext, erp_resource: ERPResource
 ) -> RunRequest | SkipReason:
     timestamps = _read_timestamps()
     previous_erp_timestamp = timestamps.get("erp")
     erp_cookies = erp_resource.refresh_cookies()
-    current_erp_timestamp = _get_erp_timestamp(erp_cookies, active_erp_mappings)
+    current_erp_timestamp = _get_erp_timestamp(erp_cookies, ERP_MAPPINGS)
     all_output_ids_changed = _check_output_ids(
         previous_erp_timestamp,
         current_erp_timestamp,
@@ -144,7 +149,7 @@ def erp_timestamp_sensor(
     monitored_jobs=[erp_active_job],
     request_job=dbt_job,
 )
-def erp_run_status_sensor(context: RunStatusSensorContext) -> RunRequest:
+def erp_active_run_status_sensor(context: RunStatusSensorContext) -> RunRequest:
     timestamps = _read_timestamps()
     erp_timestamp = timestamps.get("erp")
     last_output_id = _get_last_output_id(erp_timestamp)
