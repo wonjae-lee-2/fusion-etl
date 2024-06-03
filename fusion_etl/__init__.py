@@ -8,13 +8,17 @@ from .assets.msrp import define_msrp_blob_asset, define_msrp_src_asset
 from .assets.msrp_mappings import MSRP_MAPPINGS
 from .assets.rdp import define_rdp_blob_asset, define_rdp_src_asset
 from .assets.rdp_mappings import RDP_MAPPINGS
-from .jobs import erp_all_job
 from .resources.azure import AzureBlobResource
+from .resources.der import DERResource
 from .resources.erp import ERPResource
 from .resources.fusion import FusionResource
 from .resources.msrp import MSRPResource
 from .resources.rdp import RDPResource
-from .sensors.erp import erp_active_run_status_sensor, erp_active_timestamp_sensor
+from .sensors.erp import (
+    erp_active_run_status_sensor,
+    erp_active_timestamp_sensor,
+    erp_all_timestamp_sensor,
+)
 from .sensors.rdp import rdp_run_status_sensor, rdp_timestamp_sensor
 
 erp_blob_assets = [
@@ -65,6 +69,10 @@ msrp_resource = MSRPResource(
     msrp_login=EnvVar("MSRP_LOGIN"),
     msrp_password=EnvVar("MSRP_PASSWORD"),
 )
+der_resource = DERResource(
+    power_bi_credential_scope=EnvVar("POWER_BI_CREDENTIAL_SCOPE"),
+    der_query_endpoint=EnvVar("DER_QUERY_ENDPOINT"),
+)
 rdp_resource = RDPResource(
     azure_database_credential_scope=EnvVar("AZURE_DATABASE_CREDENTIAL_SCOPE"),
     odbc_driver=EnvVar("ODBC_DRIVER"),
@@ -90,6 +98,7 @@ defs = Definitions(
         "erp_resource": erp_resource,
         "fusion_resource": fusion_resource,
         "msrp_resource": msrp_resource,
+        "der_resource": der_resource,
         "rdp_resource": rdp_resource,
         "dbt_resource": dbt_resource,
     },
@@ -98,6 +107,6 @@ defs = Definitions(
         rdp_run_status_sensor,
         erp_active_timestamp_sensor,
         erp_active_run_status_sensor,
+        erp_all_timestamp_sensor,
     ],
-    jobs=[erp_all_job],
 )

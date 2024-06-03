@@ -17,7 +17,7 @@ from dagster import (
 from playwright.sync_api import Cookie
 
 from ..assets.erp_mappings import ERP_MAPPINGS
-from ..jobs import dbt_job, erp_active_job
+from ..jobs import dbt_job, erp_active_job, erp_all_job
 from ..resources.erp import ERPResource
 
 timestamps_path = (
@@ -67,7 +67,6 @@ def _get_erp_timestamp(
     output_timestamps = {}
 
     for erp_mapping in erp_mappings:
-        print(f"getting timestamp for {erp_mapping['source']}")
         session = requests.Session()
         for cookie in erp_cookies:
             session.cookies.set(cookie["name"], cookie["value"])
@@ -84,7 +83,6 @@ def _get_erp_timestamp(
             "job_timestamp": formatted_job_datetime,
             "status": erp_mapping["status"],
         }
-        print("... done")
 
     return output_timestamps
 
@@ -153,5 +151,22 @@ def erp_active_run_status_sensor(context: RunStatusSensorContext) -> RunRequest:
     timestamps = _read_timestamps()
     erp_timestamp = timestamps.get("erp")
     last_output_id = _get_last_output_id(erp_timestamp)
+
+    return RunRequest(run_key=last_output_id)
+
+
+@sensor(job=erp_all_job)
+def erp_all_timestamp_sensor(
+    context: SensorEvaluationContext, erp_resource: ERPResource
+) -> RunRequest | SkipReason:
+    erp_cookies = erp_resource.refresh_cookies()
+    current_erp_timestamp = _get_erp_timestamp(erp_cookies, ERP_MAPPINGS)
+    timestamps = _read_timestamps()
+    timestamps["erp"] = current_erp_timestamp
+
+    with open(timestamps_path, "w") as f:
+        json.dump(timestamps, f)
+
+    last_output_id = _get_last_output_id(current_erp_timestamp)
 
     return RunRequest(run_key=last_output_id)

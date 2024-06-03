@@ -31,7 +31,6 @@ class ERPResource(ConfigurableResource):
         return erp_cookies
 
     def _authenticate(self, browser: Browser) -> BrowserContext:
-        print("authenticating with Cloud ERP")
         context = browser.new_context()
         page = context.new_page()
         page.goto(self.oracle_analytics_publisher_url)
@@ -45,5 +44,4 @@ class ERPResource(ConfigurableResource):
         page.get_by_role("button", name="Yes").click()
         page.wait_for_load_state("domcontentloaded")
         page.goto(self.oracle_analytics_publisher_url)
-        print("... done")
         return context
