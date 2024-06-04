@@ -55,6 +55,7 @@ Use `--no-deps` to add only those packages explicitly listed. When you run `uv p
 ```bash
 uv pip compile setup.py --no-deps --extra dev -o .devcontainer/requirements.txt
 ```
+
 ### Launch Dagster webserver
 
 When you launch a Dagster webserver inside a container, make sure to set the `-h` and `-p` option to allow connections from outside the container through the open port.
@@ -62,3 +63,7 @@ When you launch a Dagster webserver inside a container, make sure to set the `-h
 ```bash
 dagster dev -h 0.0.0.0 -p 3000
 ```
+
+### MSRP HCR_BIRCPT_MVW
+
+This table's RATE_DIV column has several 0E-8 which bulk insert cannot handle. You need to manually replace them with 0 before bulk insert.
