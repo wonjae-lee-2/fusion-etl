@@ -142,19 +142,6 @@ def erp_active_timestamp_sensor(
         )
 
 
-@run_status_sensor(
-    run_status=DagsterRunStatus.SUCCESS,
-    monitored_jobs=[erp_active_job],
-    request_job=dbt_job,
-)
-def erp_active_run_status_sensor(context: RunStatusSensorContext) -> RunRequest:
-    timestamps = _read_timestamps()
-    erp_timestamp = timestamps.get("erp")
-    last_output_id = _get_last_output_id(erp_timestamp)
-
-    return RunRequest(run_key=last_output_id)
-
-
 @sensor(job=erp_all_job)
 def erp_all_timestamp_sensor(
     context: SensorEvaluationContext, erp_resource: ERPResource
@@ -168,5 +155,18 @@ def erp_all_timestamp_sensor(
         json.dump(timestamps, f)
 
     last_output_id = _get_last_output_id(current_erp_timestamp)
+
+    return RunRequest(run_key=last_output_id)
+
+
+@run_status_sensor(
+    run_status=DagsterRunStatus.SUCCESS,
+    monitored_jobs=[erp_active_job, erp_all_job],
+    request_job=dbt_job,
+)
+def erp_run_status_sensor(context: RunStatusSensorContext) -> RunRequest:
+    timestamps = _read_timestamps()
+    erp_timestamp = timestamps.get("erp")
+    last_output_id = _get_last_output_id(erp_timestamp)
 
     return RunRequest(run_key=last_output_id)
