@@ -2,6 +2,8 @@ from dagster import Definitions, EnvVar, load_assets_from_modules
 from dagster_dbt import DbtCliResource
 
 from .assets import dbt
+from .assets.der import define_der_blob_asset, define_der_src_asset
+from .assets.der_mappings import DER_MAPPINGS
 from .assets.erp import define_erp_blob_asset, define_erp_src_asset
 from .assets.erp_mappings import ERP_MAPPINGS
 from .assets.msrp import define_msrp_blob_asset, define_msrp_src_asset
@@ -14,13 +16,22 @@ from .resources.erp import ERPResource
 from .resources.fusion import FusionResource
 from .resources.msrp import MSRPResource
 from .resources.rdp import RDPResource
+from .sensors.der import der_run_status_sensor, der_timestamp_sensor
 from .sensors.erp import (
-    erp_active_run_status_sensor,
     erp_active_timestamp_sensor,
     erp_all_timestamp_sensor,
+    erp_run_status_sensor,
 )
 from .sensors.rdp import rdp_run_status_sensor, rdp_timestamp_sensor
 
+der_blob_assets = [
+    define_der_blob_asset(der_mapping, EnvVar("DAGSTER_ENV"))
+    for der_mapping in DER_MAPPINGS
+]
+der_source_assets = [
+    define_der_src_asset(der_mapping, EnvVar("DAGSTER_ENV"))
+    for der_mapping in DER_MAPPINGS
+]
 erp_blob_assets = [
     define_erp_blob_asset(erp_mapping, EnvVar("DAGSTER_ENV"))
     for erp_mapping in ERP_MAPPINGS
@@ -71,7 +82,8 @@ msrp_resource = MSRPResource(
 )
 der_resource = DERResource(
     power_bi_credential_scope=EnvVar("POWER_BI_CREDENTIAL_SCOPE"),
-    der_query_endpoint=EnvVar("DER_QUERY_ENDPOINT"),
+    der_group_id=EnvVar("DER_GROUP_ID"),
+    der_dataset_id=EnvVar("DER_DATASET_ID"),
 )
 rdp_resource = RDPResource(
     azure_database_credential_scope=EnvVar("AZURE_DATABASE_CREDENTIAL_SCOPE"),
@@ -85,6 +97,8 @@ dbt_resource = DbtCliResource(project_dir=dbt_project_dir)
 
 defs = Definitions(
     assets=[
+        *der_blob_assets,
+        *der_source_assets,
         *erp_blob_assets,
         *erp_source_assets,
         *msrp_blob_assets,
@@ -103,10 +117,12 @@ defs = Definitions(
         "dbt_resource": dbt_resource,
     },
     sensors=[
+        der_timestamp_sensor,
+        der_run_status_sensor,
+        erp_active_timestamp_sensor,
+        erp_all_timestamp_sensor,
+        erp_run_status_sensor,
         rdp_timestamp_sensor,
         rdp_run_status_sensor,
-        erp_active_timestamp_sensor,
-        erp_active_run_status_sensor,
-        erp_all_timestamp_sensor,
     ],
 )
