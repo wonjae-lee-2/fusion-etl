@@ -3,8 +3,8 @@ import io
 
 from dagster import AssetsDefinition, EnvVar, MaterializeResult, asset
 
+from ..resources.azsql import AzSQLResource
 from ..resources.azure import AzureBlobResource
-from ..resources.fusion import FusionResource
 from ..resources.msrp import MSRPResource
 
 
@@ -101,7 +101,7 @@ def define_msrp_src_asset(
         deps=[["msrp", upstream_asset_name]],
     )
     def _msrp_src_asset(
-        fusion_resource: FusionResource,
+        fusion_resource: AzSQLResource,
     ) -> MaterializeResult:
         target_table = msrp_mapping["target"]
         container_name = dagster_env.get_value()

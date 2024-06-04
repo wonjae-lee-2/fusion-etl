@@ -7,23 +7,30 @@ from azure.identity import AzureCliCredential
 from dagster import ConfigurableResource
 
 
-class FusionResource(ConfigurableResource):
+class AzSQLResource(ConfigurableResource):
     SQL_COPT_SS_ACCESS_TOKEN: int = 1256
     azure_database_credential_scope: str
     odbc_driver: str
-    fusion_server: str
-    fusion_database: str
+    server: str
+    database: str
 
     def connect(self) -> pyodbc.Connection:
         attrs_before = self._get_pyodbc_attrs_before()
         conn_str = f"""
                 Driver={self.odbc_driver};
-                Server={self.fusion_server};
-                Database={self.fusion_database};
+                Server={self.server};
+                Database={self.database};
             """
         conn = pyodbc.connect(
             conn_str,
             attrs_before=attrs_before,
+        )
+        conn.add_output_converter(
+            pyodbc.SQL_BIT,
+            lambda x: int.from_bytes(
+                x,
+                byteorder="big",
+            ),
         )
         return conn
 

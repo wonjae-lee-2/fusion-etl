@@ -1,14 +1,14 @@
 import csv
 import io
 import json
-from pathlib import Path
 import re
+from pathlib import Path
 
 from dagster import AssetsDefinition, EnvVar, MaterializeResult, asset
 
+from ..resources.azsql import AzSQLResource
 from ..resources.azure import AzureBlobResource
 from ..resources.der import DERResource
-from ..resources.fusion import FusionResource
 
 
 def _get_der_timestamp_date() -> str:
@@ -162,7 +162,7 @@ def define_der_src_asset(
         deps=[["der", upstream_asset_name]],
     )
     def _der_src_asset(
-        fusion_resource: FusionResource,
+        fusion_resource: AzSQLResource,
     ) -> MaterializeResult:
         target_table = der_mapping["target"]
         container_name = dagster_env.get_value()

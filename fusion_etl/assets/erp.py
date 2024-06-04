@@ -6,9 +6,9 @@ import requests
 from dagster import AssetsDefinition, EnvVar, MaterializeResult, asset
 from playwright.sync_api import Cookie
 
+from ..resources.azsql import AzSQLResource
 from ..resources.azure import AzureBlobResource
 from ..resources.erp import ERPResource
-from ..resources.fusion import FusionResource
 
 timestamps_path = (
     Path(EnvVar("SQLITE_STORAGE_BASE_DIR").get_value())
@@ -139,7 +139,7 @@ def define_erp_src_asset(
         tags={"status": erp_mapping["status"]},
     )
     def _erp_src_asset(
-        fusion_resource: FusionResource,
+        fusion_resource: AzSQLResource,
     ) -> MaterializeResult:
         target_table = erp_mapping["target"]
         container_name = dagster_env.get_value()

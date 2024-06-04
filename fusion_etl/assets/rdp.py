@@ -5,9 +5,8 @@ from pathlib import Path
 
 from dagster import AssetsDefinition, EnvVar, MaterializeResult, asset
 
+from ..resources.azsql import AzSQLResource
 from ..resources.azure import AzureBlobResource
-from ..resources.fusion import FusionResource
-from ..resources.rdp import RDPResource
 
 
 def _get_rdp_timestamp_date() -> str:
@@ -47,10 +46,10 @@ def define_rdp_blob_asset(
         compute_kind="azure",
     )
     def _rdp_blob_asset(
-        rdp_resource: RDPResource,
+        rdp_resource: AzSQLResource,
         azure_blob_resource: AzureBlobResource,
     ) -> MaterializeResult:
-        def _query_rdp(rdp_resource: RDPResource) -> list[tuple[int | str, ...]]:
+        def _query_rdp(rdp_resource: AzSQLResource) -> list[tuple[int | str, ...]]:
             source_table = rdp_mapping["source"]
             sql = f"""
                 SELECT * FROM {source_table};
@@ -120,7 +119,7 @@ def define_rdp_src_asset(
         deps=[["rdp", upstream_asset_name]],
     )
     def _rdp_src_asset(
-        fusion_resource: FusionResource,
+        fusion_resource: AzSQLResource,
     ) -> MaterializeResult:
         target_table = rdp_mapping["target"]
         container_name = dagster_env.get_value()

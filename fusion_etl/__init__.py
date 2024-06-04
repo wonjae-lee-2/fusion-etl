@@ -10,12 +10,11 @@ from .assets.msrp import define_msrp_blob_asset, define_msrp_src_asset
 from .assets.msrp_mappings import MSRP_MAPPINGS
 from .assets.rdp import define_rdp_blob_asset, define_rdp_src_asset
 from .assets.rdp_mappings import RDP_MAPPINGS
+from .resources.azsql import AzSQLResource
 from .resources.azure import AzureBlobResource
 from .resources.der import DERResource
 from .resources.erp import ERPResource
-from .resources.fusion import FusionResource
 from .resources.msrp import MSRPResource
-from .resources.rdp import RDPResource
 from .sensors.dbt import dbt_run_status_sensor
 from .sensors.der import der_timestamp_sensor
 from .sensors.erp import erp_active_timestamp_sensor, erp_all_timestamp_sensor
@@ -64,11 +63,11 @@ erp_resource = ERPResource(
     unhcr_email=EnvVar("UNHCR_EMAIL"),
     unhcr_password=EnvVar("UNHCR_PASSWORD"),
 )
-fusion_resource = FusionResource(
+fusion_resource = AzSQLResource(
     azure_database_credential_scope=EnvVar("AZURE_DATABASE_CREDENTIAL_SCOPE"),
     odbc_driver=EnvVar("ODBC_DRIVER"),
-    fusion_server=EnvVar("FUSION_SERVER"),
-    fusion_database=EnvVar("FUSION_DATABASE"),
+    server=EnvVar("FUSION_SERVER"),
+    database=EnvVar("FUSION_DATABASE"),
 )
 msrp_resource = MSRPResource(
     odbc_driver=EnvVar("ODBC_DRIVER"),
@@ -82,11 +81,11 @@ der_resource = DERResource(
     der_group_id=EnvVar("DER_GROUP_ID"),
     der_dataset_id=EnvVar("DER_DATASET_ID"),
 )
-rdp_resource = RDPResource(
+rdp_resource = AzSQLResource(
     azure_database_credential_scope=EnvVar("AZURE_DATABASE_CREDENTIAL_SCOPE"),
     odbc_driver=EnvVar("ODBC_DRIVER"),
-    rdp_server=EnvVar("RDP_SERVER"),
-    rdp_database=EnvVar("RDP_DATABASE"),
+    server=EnvVar("RDP_SERVER"),
+    database=EnvVar("RDP_DATABASE"),
 )
 dbt_project_dir = EnvVar("DBT_PROJECT_DIR").get_value()
 dbt_resource = DbtCliResource(project_dir=dbt_project_dir)

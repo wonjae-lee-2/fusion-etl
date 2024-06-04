@@ -10,7 +10,7 @@ from dagster import (
 )
 
 from ..jobs import rdp_job
-from ..resources.rdp import RDPResource
+from ..resources.azsql import AzSQLResource
 
 timestamps_path = (
     Path(EnvVar("SQLITE_STORAGE_BASE_DIR").get_value())
@@ -29,7 +29,7 @@ def _read_timestamps() -> dict:
     return timestamps
 
 
-def _get_rdp_timestamp(rdp_resource: RDPResource) -> str:
+def _get_rdp_timestamp(rdp_resource: AzSQLResource) -> str:
     sql = """
         SELECT MAX(ExecutionEndTime)
         FROM srv._ExecutionLog
@@ -50,7 +50,8 @@ def _get_rdp_timestamp(rdp_resource: RDPResource) -> str:
 
 @sensor(job=rdp_job, minimum_interval_seconds=60 * 60)
 def rdp_timestamp_sensor(
-    context: SensorEvaluationContext, rdp_resource: RDPResource
+    context: SensorEvaluationContext,
+    rdp_resource: AzSQLResource,
 ) -> RunRequest:
     timestamps = _read_timestamps()
     previous_rdp_timestamp = timestamps.get("rdp")
