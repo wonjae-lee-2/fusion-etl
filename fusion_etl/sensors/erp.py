@@ -5,19 +5,16 @@ from pathlib import Path
 
 import requests
 from dagster import (
-    DagsterRunStatus,
     EnvVar,
     RunRequest,
-    RunStatusSensorContext,
     SensorEvaluationContext,
     SkipReason,
-    run_status_sensor,
     sensor,
 )
 from playwright.sync_api import Cookie
 
 from ..assets.erp_mappings import ERP_MAPPINGS
-from ..jobs import dbt_job, erp_active_job, erp_all_job
+from ..jobs import erp_active_job, erp_all_job
 from ..resources.erp import ERPResource
 
 timestamps_path = (
@@ -155,18 +152,5 @@ def erp_all_timestamp_sensor(
         json.dump(timestamps, f)
 
     last_output_id = _get_last_output_id(current_erp_timestamp)
-
-    return RunRequest(run_key=last_output_id)
-
-
-@run_status_sensor(
-    run_status=DagsterRunStatus.SUCCESS,
-    monitored_jobs=[erp_active_job, erp_all_job],
-    request_job=dbt_job,
-)
-def erp_run_status_sensor(context: RunStatusSensorContext) -> RunRequest:
-    timestamps = _read_timestamps()
-    erp_timestamp = timestamps.get("erp")
-    last_output_id = _get_last_output_id(erp_timestamp)
 
     return RunRequest(run_key=last_output_id)

@@ -2,16 +2,13 @@ import json
 from pathlib import Path
 
 from dagster import (
-    DagsterRunStatus,
     EnvVar,
     RunRequest,
-    RunStatusSensorContext,
     SensorEvaluationContext,
-    run_status_sensor,
     sensor,
 )
 
-from ..jobs import dbt_job, der_job
+from ..jobs import der_job
 from ..resources.der import DERResource
 
 timestamps_path = (
@@ -46,15 +43,3 @@ def der_timestamp_sensor(
             json.dump(timestamps, f)
 
     return RunRequest(run_key=current_der_timestamp)
-
-
-@run_status_sensor(
-    run_status=DagsterRunStatus.SUCCESS,
-    monitored_jobs=[der_job],
-    request_job=dbt_job,
-)
-def der_run_status_sensor(context: RunStatusSensorContext) -> RunRequest:
-    timestamps = _read_timestamps()
-    der_timestamp = timestamps.get("der")
-
-    return RunRequest(run_key=der_timestamp)
