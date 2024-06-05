@@ -5,7 +5,7 @@ from dagster import AssetsDefinition, EnvVar, MaterializeResult, asset
 
 from ..resources.azblob import AzBlobResource
 from ..resources.azsql import AzSQLResource
-from ..resources.msrp import MSRPResource
+from ..resources.finbi import FINBIResource
 
 
 def define_msrp_blob_asset(
@@ -21,7 +21,7 @@ def define_msrp_blob_asset(
         compute_kind="azure",
     )
     def _msrp_blob_asset(
-        msrp_resource: MSRPResource,
+        msrp_resource: FINBIResource,
         blob_resource: AzBlobResource,
     ) -> MaterializeResult:
         def _upload_blob(
@@ -48,7 +48,7 @@ def define_msrp_blob_asset(
 
             return (container_name, blob_name)
 
-        def _sync_msrp(msrp_resource: MSRPResource) -> tuple[str | None, str]:
+        def _sync_msrp(msrp_resource: FINBIResource) -> tuple[str | None, str]:
             source_table = msrp_mapping["source"]
             sql = f"""
                 SELECT * FROM {source_table};

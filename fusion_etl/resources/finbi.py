@@ -5,7 +5,7 @@ import pyodbc
 from dagster import ConfigurableResource
 
 
-class MSRPResource(ConfigurableResource):
+class FINBIResource(ConfigurableResource):
     odbc_driver: str
     msrp_server: str
     msrp_database: str

@@ -13,7 +13,7 @@ from .assets.rdp_mappings import RDP_MAPPINGS
 from .resources.azblob import AzBlobResource
 from .resources.azsql import AzSQLResource
 from .resources.erp import ERPResource
-from .resources.msrp import MSRPResource
+from .resources.finbi import FINBIResource
 from .resources.pbi import PowerBIResource
 from .sensors.dbt import dbt_run_status_sensor
 from .sensors.der import der_timestamp_sensor
@@ -69,7 +69,7 @@ fusion_resource = AzSQLResource(
     server=EnvVar("FUSION_SERVER"),
     database=EnvVar("FUSION_DATABASE"),
 )
-msrp_resource = MSRPResource(
+msrp_resource = FINBIResource(
     odbc_driver=EnvVar("ODBC_DRIVER"),
     msrp_server=EnvVar("MSRP_SERVER"),
     msrp_database=EnvVar("MSRP_DATABASE"),
