@@ -1,20 +1,20 @@
 name: fusion_etl
 
 services:
-  prod:
+  prd:
     environment:
-      - DAGSTER_ENV=prod
+      - DAGSTER_ENV=prd
     build:
       context: .
       dockerfile: Dockerfile
     restart: unless-stopped
     volumes:
       - type: volume
-        source: prod
+        source: prd
         target: /opt/dagster/storage/
     ports:
       - "3000:3000"
 
 volumes:
-  prod:
+  prd:
     driver: local

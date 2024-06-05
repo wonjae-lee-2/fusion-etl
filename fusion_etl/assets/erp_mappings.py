@@ -1,4 +1,4 @@
-CERP_MAPPINGS = [
+ERP_MAPPINGS = [
     {
         "name": "FND_LOOKUP_VALUES_TL",
         "status": "active",

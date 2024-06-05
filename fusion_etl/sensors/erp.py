@@ -13,8 +13,8 @@ from dagster import (
 )
 from playwright.sync_api import Cookie
 
-from ..assets.cerp_mappings import CERP_MAPPINGS
-from ..jobs import cerp_active_job, cerp_all_job
+from ..assets.erp_mappings import ERP_MAPPINGS
+from ..jobs import erp_active_job, erp_all_job
 from ..resources.bip import BIPublisherResource
 
 timestamps_path = (
@@ -22,9 +22,14 @@ timestamps_path = (
     .joinpath("timestamps.json")
     .resolve()
 )
+erp_cookies_path = (
+    Path(EnvVar("SQLITE_STORAGE_BASE_DIR").get_value())
+    .joinpath("erp_cookies.pkl")
+    .resolve()
+)
 job_info_url = EnvVar("JOB_INFO_URL").get_value()
 output_info_url = EnvVar("OUTPUT_INFO_URL").get_value()
-active_cerp_mappings = [x for x in CERP_MAPPINGS if x["status"] == "active"]
+active_erp_mappings = [x for x in ERP_MAPPINGS if x["status"] == "active"]
 
 
 def _read_timestamps() -> dict:
@@ -52,17 +57,17 @@ def _format_job_datetime(job_datetime: int) -> str:
     return formatted_job_datetime
 
 
-def _get_cerp_timestamp(
-    cerp_cookies: list[Cookie],
-    cerp_mappings: list[dict[str, str]],
+def _get_erp_timestamp(
+    erp_cookies: list[Cookie],
+    erp_mappings: list[dict[str, str]],
 ) -> dict[str, dict[str, str]]:
     output_timestamps = {}
 
-    for cerp_mapping in cerp_mappings:
+    for erp_mapping in erp_mappings:
         session = requests.Session()
-        for cookie in cerp_cookies:
+        for cookie in erp_cookies:
             session.cookies.set(cookie["name"], cookie["value"])
-        job_response = session.get(job_info_url.format(cerp_mapping["source"]))
+        job_response = session.get(job_info_url.format(erp_mapping["source"]))
         job_dict = json.loads(_correct_response_text(job_response.text))
         job_datetime = job_dict[0]["dateStarted"]
         formatted_job_datetime = _format_job_datetime(job_datetime)
@@ -70,26 +75,26 @@ def _get_cerp_timestamp(
         output_response = session.get(output_info_url.format(job_id))
         output_dict = json.loads(_correct_response_text(output_response.text))
         output_id = output_dict["outputList"][0]["OutputId"]
-        output_timestamps[cerp_mapping["source"]] = {
+        output_timestamps[erp_mapping["source"]] = {
             "output_id": output_id,
             "job_timestamp": formatted_job_datetime,
-            "status": cerp_mapping["status"],
+            "status": erp_mapping["status"],
         }
 
     return output_timestamps
 
 
 def _check_output_ids(
-    previous_cerp_timestamp: dict[str, dict[str, str]],
-    current_cerp_timestamp: dict[str, dict[str, str]],
+    previous_erp_timestamp: dict[str, dict[str, str]],
+    current_erp_timestamp: dict[str, dict[str, str]],
 ) -> bool:
-    if not previous_cerp_timestamp:
+    if not previous_erp_timestamp:
         return True
 
-    previous_output_ids = [x["output_id"] for x in previous_cerp_timestamp.values()]
+    previous_output_ids = [x["output_id"] for x in previous_erp_timestamp.values()]
     current_active_output_ids = [
         x["output_id"]
-        for x in current_cerp_timestamp.values()
+        for x in current_erp_timestamp.values()
         if x["status"] == "active"
     ]
     for output_id in current_active_output_ids:
@@ -99,33 +104,33 @@ def _check_output_ids(
     return True
 
 
-def _get_last_output_id(cerp_timestamp: dict[str, dict[str, str]]) -> str:
-    output_ids = [x["output_id"] for x in cerp_timestamp.values()]
+def _get_last_output_id(erp_timestamp: dict[str, dict[str, str]]) -> str:
+    output_ids = [x["output_id"] for x in erp_timestamp.values()]
     last_output_id = max(output_ids)
 
     return last_output_id
 
 
-@sensor(job=cerp_active_job, minimum_interval_seconds=60 * 60)
-def cerp_active_timestamp_sensor(
-    context: SensorEvaluationContext, cerp_resource: BIPublisherResource
+@sensor(job=erp_active_job, minimum_interval_seconds=60 * 60)
+def erp_active_timestamp_sensor(
+    context: SensorEvaluationContext, erp_resource: BIPublisherResource
 ) -> RunRequest | SkipReason:
     timestamps = _read_timestamps()
-    previous_cerp_timestamp = timestamps.get("cerp")
-    cerp_cookies = cerp_resource.refresh_cookies()
-    current_cerp_timestamp = _get_cerp_timestamp(cerp_cookies, CERP_MAPPINGS)
+    previous_erp_timestamp = timestamps.get("erp")
+    erp_cookies = erp_resource.refresh_cookies()
+    current_erp_timestamp = _get_erp_timestamp(erp_cookies, ERP_MAPPINGS)
     all_output_ids_changed = _check_output_ids(
-        previous_cerp_timestamp,
-        current_cerp_timestamp,
+        previous_erp_timestamp,
+        current_erp_timestamp,
     )
 
     if all_output_ids_changed:
-        timestamps["cerp"] = current_cerp_timestamp
+        timestamps["erp"] = current_erp_timestamp
 
         with open(timestamps_path, "w") as f:
             json.dump(timestamps, f)
 
-        last_output_id = _get_last_output_id(current_cerp_timestamp)
+        last_output_id = _get_last_output_id(current_erp_timestamp)
 
         return RunRequest(run_key=last_output_id)
     else:
@@ -134,18 +139,18 @@ def cerp_active_timestamp_sensor(
         )
 
 
-@sensor(job=cerp_all_job)
-def cerp_all_timestamp_sensor(
-    context: SensorEvaluationContext, cerp_resource: BIPublisherResource
+@sensor(job=erp_all_job)
+def erp_all_timestamp_sensor(
+    context: SensorEvaluationContext, erp_resource: BIPublisherResource
 ) -> RunRequest | SkipReason:
-    cerp_cookies = cerp_resource.refresh_cookies()
-    current_cerp_timestamp = _get_cerp_timestamp(cerp_cookies, CERP_MAPPINGS)
+    erp_cookies = erp_resource.refresh_cookies()
+    current_erp_timestamp = _get_erp_timestamp(erp_cookies, ERP_MAPPINGS)
     timestamps = _read_timestamps()
-    timestamps["cerp"] = current_cerp_timestamp
+    timestamps["erp"] = current_erp_timestamp
 
     with open(timestamps_path, "w") as f:
         json.dump(timestamps, f)
 
-    last_output_id = _get_last_output_id(current_cerp_timestamp)
+    last_output_id = _get_last_output_id(current_erp_timestamp)
 
     return RunRequest(run_key=last_output_id)

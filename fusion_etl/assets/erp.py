@@ -8,78 +8,80 @@ from playwright.sync_api import Cookie
 
 from ..resources.azblob import AzBlobResource
 from ..resources.azsql import AzSQLResource
+from ..resources.bip import BIPublisherResource
 
 timestamps_path = (
     Path(EnvVar("SQLITE_STORAGE_BASE_DIR").get_value())
     .joinpath("timestamps.json")
     .resolve()
 )
-cerp_cookies_path = (
+erp_cookies_path = (
     Path(EnvVar("SQLITE_STORAGE_BASE_DIR").get_value())
-    .joinpath("cerp_cookies.pkl")
+    .joinpath("erp_cookies.pkl")
     .resolve()
 )
 output_download_url = EnvVar("OUTPUT_DOWNLOAD_URL").get_value()
 
 
-def _read_cerp_timestamps(timestamps_path: Path) -> dict[str, dict[str, str]]:
+def _read_erp_timestamps(timestamps_path: Path) -> dict[str, dict[str, str]]:
     if not timestamps_path.is_file():
         raise FileNotFoundError(
-            f"timestamps.json was not found at {timestamps_path}. Please run the cerp timestamp sensor first."
+            f"timestamps.json was not found at {timestamps_path}. Please run the erp timestamp sensor first."
         )
 
     with open(timestamps_path, "r") as f:
         timestamps: dict = json.load(f)
-    cerp_timestamps: dict[str, dict[str, str]] = timestamps.get("cerp")
+    erp_timestamps: dict[str, dict[str, str]] = timestamps.get("erp")
 
-    if not cerp_timestamps:
+    if not erp_timestamps:
         raise ValueError(
-            "The cerp timestamp was not found in timestamps.json. Please run the cerp timestamp sensor first."
+            "The erp timestamp was not found in timestamps.json. Please run the erp timestamp sensor first."
         )
 
-    return cerp_timestamps
+    return erp_timestamps
 
 
 def _read_output_timestamp(
     timestamps_path: Path,
-    cerp_mapping: dict[str, str],
+    erp_mapping: dict[str, str],
 ) -> tuple[str, str]:
-    cerp_timestamps = _read_cerp_timestamps(timestamps_path)
+    erp_timestamps = _read_erp_timestamps(timestamps_path)
 
-    output_id = cerp_timestamps.get(cerp_mapping["source"]).get("output_id")
-    job_timestamp = cerp_timestamps.get(cerp_mapping["source"]).get("job_timestamp")
+    output_id = erp_timestamps.get(erp_mapping["source"]).get("output_id")
+    job_timestamp = erp_timestamps.get(erp_mapping["source"]).get("job_timestamp")
 
     return (output_id, job_timestamp)
 
 
-def define_cerp_blob_asset(
-    cerp_mapping: dict[str, str],
+def define_erp_blob_asset(
+    erp_mapping: dict[str, str],
     dagster_env: EnvVar,
 ) -> AssetsDefinition:
-    asset_name = f"cerp_blob__{cerp_mapping['name']}"
+    asset_name = f"erp_blob__{erp_mapping['name']}"
 
     @asset(
-        key_prefix="cerp",
-        group_name="cerp_blob",
+        key_prefix="erp",
+        group_name="erp_blob",
         name=asset_name,
         compute_kind="azure",
-        tags={"status": cerp_mapping["status"]},
+        tags={"status": erp_mapping["status"]},
     )
-    def _cerp_blob_asset(
+    def _erp_blob_asset(
+        erp_resource: BIPublisherResource,
         blob_resource: AzBlobResource,
     ) -> MaterializeResult:
-        def _read_cerp_cookies(cerp_cookies_path: Path) -> list[Cookie]:
-            with cerp_cookies_path.open("rb") as f:
-                cerp_cookies = pickle.load(f)
+        def _read_erp_cookies(erp_cookies_path: Path) -> list[Cookie]:
+            with erp_cookies_path.open("rb") as f:
+                erp_cookies = pickle.load(f)
 
-            return cerp_cookies
+            return erp_cookies
 
-        def _download_cerp() -> bytes:
-            cerp_cookies = _read_cerp_cookies(cerp_cookies_path)
-            output_id, _ = _read_output_timestamp(timestamps_path, cerp_mapping)
+        def _download_erp() -> bytes:
+            erp_cookies = _read_erp_cookies(erp_cookies_path)
+            output_id, _ = _read_output_timestamp(timestamps_path, erp_mapping)
 
             session = requests.Session()
-            for cookie in cerp_cookies:
+            for cookie in erp_cookies:
                 session.cookies.set(cookie["name"], cookie["value"])
             download_response = session.get(output_download_url.format(output_id))
 
@@ -90,7 +92,7 @@ def define_cerp_blob_asset(
             download_content: bytes,
         ) -> tuple[str, str]:
             container_name = dagster_env.get_value()
-            _, job_timestamp = _read_output_timestamp(timestamps_path, cerp_mapping)
+            _, job_timestamp = _read_output_timestamp(timestamps_path, erp_mapping)
             job_timestamp_date = job_timestamp[:10]
             blob_name = f"{job_timestamp_date}/{asset_name}.csv"
 
@@ -106,7 +108,7 @@ def define_cerp_blob_asset(
 
             return (container_name, blob_name)
 
-        download_content = _download_cerp()
+        download_content = _download_erp()
         (container_name, blob_name) = _upload_blob(blob_resource, download_content)
 
         return MaterializeResult(
@@ -116,30 +118,30 @@ def define_cerp_blob_asset(
             }
         )
 
-    return _cerp_blob_asset
+    return _erp_blob_asset
 
 
-def define_cerp_src_asset(
-    cerp_mapping: dict[str, str],
+def define_erp_src_asset(
+    erp_mapping: dict[str, str],
     dagster_env: EnvVar,
 ) -> AssetsDefinition:
-    asset_name = f"cerp_src__{cerp_mapping['name']}"
-    upstream_asset_name = f"cerp_blob__{cerp_mapping['name']}"
+    asset_name = f"erp_src__{erp_mapping['name']}"
+    upstream_asset_name = f"erp_blob__{erp_mapping['name']}"
 
     @asset(
-        key_prefix="cerp",
-        group_name="cerp_src",
+        key_prefix="erp",
+        group_name="erp_src",
         name=asset_name,
         compute_kind="sql",
-        deps=[["cerp", upstream_asset_name]],
-        tags={"status": cerp_mapping["status"]},
+        deps=[["erp", upstream_asset_name]],
+        tags={"status": erp_mapping["status"]},
     )
-    def _cerp_src_asset(
+    def _erp_src_asset(
         fusion_resource: AzSQLResource,
     ) -> MaterializeResult:
-        target_table = cerp_mapping["target"]
+        target_table = erp_mapping["target"]
         container_name = dagster_env.get_value()
-        _, job_timestamp = _read_output_timestamp(timestamps_path, cerp_mapping)
+        _, job_timestamp = _read_output_timestamp(timestamps_path, erp_mapping)
         job_timestamp_date = job_timestamp[:10]
         blob_name = f"{job_timestamp_date}/{upstream_asset_name}.csv"
         sql = f"""
@@ -153,6 +155,6 @@ def define_cerp_src_asset(
             with conn.cursor() as cursor:
                 cursor.execute(sql)
 
-        return MaterializeResult(metadata={"Table Name": cerp_mapping["target"]})
+        return MaterializeResult(metadata={"Table Name": erp_mapping["target"]})
 
-    return _cerp_src_asset
+    return _erp_src_asset
