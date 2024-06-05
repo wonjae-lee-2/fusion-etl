@@ -55,8 +55,8 @@ rdp_source_assets = [
 dbt_assets = load_assets_from_modules([dbt])
 
 blob_resource = AzBlobResource(
-    account_url=EnvVar("AZURE_STORAGE_URL"),
-    credential=EnvVar("AZURE_STORAGE_ACCESS_KEY"),
+    blob_storage_url=EnvVar("AZURE_BLOB_STORAGE_URL"),
+    storage_access_key=EnvVar("AZURE_STORAGE_ACCESS_KEY"),
 )
 erp_resource = BIPublisherResource(
     oracle_analytics_publisher_url=EnvVar("ORACLE_ANALYTICS_PUBLISHER_URL"),
