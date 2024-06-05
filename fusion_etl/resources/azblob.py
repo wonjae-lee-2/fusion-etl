@@ -2,7 +2,7 @@ from azure.storage.blob import BlobServiceClient
 from dagster import ConfigurableResource
 
 
-class AzureBlobResource(ConfigurableResource):
+class AzBlobResource(ConfigurableResource):
     account_url: str
     credential: str
 

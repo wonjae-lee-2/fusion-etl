@@ -5,8 +5,8 @@ from pathlib import Path
 
 from dagster import AssetsDefinition, EnvVar, MaterializeResult, asset
 
+from ..resources.azblob import AzBlobResource
 from ..resources.azsql import AzSQLResource
-from ..resources.azure import AzureBlobResource
 
 
 def _get_rdp_timestamp_date() -> str:
@@ -47,7 +47,7 @@ def define_rdp_blob_asset(
     )
     def _rdp_blob_asset(
         rdp_resource: AzSQLResource,
-        azure_blob_resource: AzureBlobResource,
+        blob_resource: AzBlobResource,
     ) -> MaterializeResult:
         def _query_rdp(rdp_resource: AzSQLResource) -> list[tuple[int | str, ...]]:
             source_table = rdp_mapping["source"]
@@ -65,7 +65,7 @@ def define_rdp_blob_asset(
             return rows_with_header
 
         def _upload_blob(
-            azure_blob_resource: AzureBlobResource,
+            blob_resource: AzBlobResource,
             rows_with_header: list[tuple[int | str, ...]],
         ) -> tuple[str | None, str]:
             container_name = dagster_env.get_value()
@@ -76,7 +76,7 @@ def define_rdp_blob_asset(
                 writer = csv.writer(buffer)
                 writer.writerows(rows_with_header)
                 blob_client = (
-                    azure_blob_resource.get_blob_service_client().get_blob_client(
+                    blob_resource.get_blob_service_client().get_blob_client(
                         container=container_name,
                         blob=blob_name,
                     )
@@ -91,7 +91,7 @@ def define_rdp_blob_asset(
 
         rows_with_header = _query_rdp(rdp_resource)
         (container_name, blob_name) = _upload_blob(
-            azure_blob_resource, rows_with_header
+            blob_resource, rows_with_header
         )
 
         return MaterializeResult(

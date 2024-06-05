@@ -6,8 +6,8 @@ import requests
 from dagster import AssetsDefinition, EnvVar, MaterializeResult, asset
 from playwright.sync_api import Cookie
 
+from ..resources.azblob import AzBlobResource
 from ..resources.azsql import AzSQLResource
-from ..resources.azure import AzureBlobResource
 from ..resources.erp import ERPResource
 
 timestamps_path = (
@@ -68,7 +68,7 @@ def define_erp_blob_asset(
     )
     def _erp_blob_asset(
         erp_resource: ERPResource,
-        azure_blob_resource: AzureBlobResource,
+        blob_resource: AzBlobResource,
     ) -> MaterializeResult:
         def _read_erp_cookies(erp_cookies_path: Path) -> list[Cookie]:
             with erp_cookies_path.open("rb") as f:
@@ -88,7 +88,7 @@ def define_erp_blob_asset(
             return download_response.content
 
         def _upload_blob(
-            azure_blob_resource: AzureBlobResource,
+            blob_resource: AzBlobResource,
             download_content: bytes,
         ) -> tuple[str, str]:
             container_name = dagster_env.get_value()
@@ -96,7 +96,7 @@ def define_erp_blob_asset(
             job_timestamp_date = job_timestamp[:10]
             blob_name = f"{job_timestamp_date}/{asset_name}.csv"
 
-            blob_client = azure_blob_resource.get_blob_service_client().get_blob_client(
+            blob_client = blob_resource.get_blob_service_client().get_blob_client(
                 container=container_name,
                 blob=blob_name,
             )
@@ -110,7 +110,7 @@ def define_erp_blob_asset(
 
         download_content = _download_erp()
         (container_name, blob_name) = _upload_blob(
-            azure_blob_resource, download_content
+            blob_resource, download_content
         )
 
         return MaterializeResult(

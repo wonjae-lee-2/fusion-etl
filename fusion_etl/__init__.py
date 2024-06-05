@@ -10,8 +10,8 @@ from .assets.msrp import define_msrp_blob_asset, define_msrp_src_asset
 from .assets.msrp_mappings import MSRP_MAPPINGS
 from .assets.rdp import define_rdp_blob_asset, define_rdp_src_asset
 from .assets.rdp_mappings import RDP_MAPPINGS
+from .resources.azblob import AzBlobResource
 from .resources.azsql import AzSQLResource
-from .resources.azure import AzureBlobResource
 from .resources.der import DERResource
 from .resources.erp import ERPResource
 from .resources.msrp import MSRPResource
@@ -54,7 +54,7 @@ rdp_source_assets = [
 ]
 dbt_assets = load_assets_from_modules([dbt])
 
-azure_blob_resource = AzureBlobResource(
+blob_resource = AzBlobResource(
     account_url=EnvVar("AZURE_STORAGE_URL"),
     credential=EnvVar("AZURE_STORAGE_ACCESS_KEY"),
 )
@@ -104,7 +104,7 @@ defs = Definitions(
         *dbt_assets,
     ],
     resources={
-        "azure_blob_resource": azure_blob_resource,
+        "blob_resource": blob_resource,
         "erp_resource": erp_resource,
         "fusion_resource": fusion_resource,
         "msrp_resource": msrp_resource,

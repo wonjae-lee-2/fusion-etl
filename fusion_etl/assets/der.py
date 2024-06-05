@@ -6,8 +6,8 @@ from pathlib import Path
 
 from dagster import AssetsDefinition, EnvVar, MaterializeResult, asset
 
+from ..resources.azblob import AzBlobResource
 from ..resources.azsql import AzSQLResource
-from ..resources.azure import AzureBlobResource
 from ..resources.der import DERResource
 
 
@@ -49,7 +49,7 @@ def define_der_blob_asset(
     )
     def _der_blob_asset(
         der_resource: DERResource,
-        azure_blob_resource: AzureBlobResource,
+        blob_resource: AzBlobResource,
     ) -> MaterializeResult:
         def _get_row_count(der_resource: DERResource) -> int:
             source_table = der_mapping["source"]
@@ -108,7 +108,7 @@ def define_der_blob_asset(
             return all_rows
 
         def _upload_blob(
-            azure_blob_resource: AzureBlobResource,
+            blob_resource: AzBlobResource,
             rows: list[dict],
         ) -> tuple[str | None, str]:
             container_name = dagster_env.get_value()
@@ -120,11 +120,9 @@ def define_der_blob_asset(
                 writer = csv.DictWriter(buffer, fieldnames=column_names)
                 writer.writeheader()
                 writer.writerows(rows)
-                blob_client = (
-                    azure_blob_resource.get_blob_service_client().get_blob_client(
-                        container=container_name,
-                        blob=blob_name,
-                    )
+                blob_client = blob_resource.get_blob_service_client().get_blob_client(
+                    container=container_name,
+                    blob=blob_name,
                 )
                 blob_client.upload_blob(
                     buffer.getvalue(),
@@ -135,7 +133,7 @@ def define_der_blob_asset(
             return (container_name, blob_name)
 
         all_rows = _query_dataset(der_resource)
-        (container_name, blob_name) = _upload_blob(azure_blob_resource, all_rows)
+        (container_name, blob_name) = _upload_blob(blob_resource, all_rows)
 
         return MaterializeResult(
             metadata={

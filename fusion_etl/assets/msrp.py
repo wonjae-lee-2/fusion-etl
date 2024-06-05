@@ -3,8 +3,8 @@ import io
 
 from dagster import AssetsDefinition, EnvVar, MaterializeResult, asset
 
+from ..resources.azblob import AzBlobResource
 from ..resources.azsql import AzSQLResource
-from ..resources.azure import AzureBlobResource
 from ..resources.msrp import MSRPResource
 
 
@@ -22,10 +22,10 @@ def define_msrp_blob_asset(
     )
     def _msrp_blob_asset(
         msrp_resource: MSRPResource,
-        azure_blob_resource: AzureBlobResource,
+        blob_resource: AzBlobResource,
     ) -> MaterializeResult:
         def _upload_blob(
-            azure_blob_resource: AzureBlobResource,
+            blob_resource: AzBlobResource,
             rows: list[tuple[int | str, ...]],
             overwrite_flag: bool,
         ) -> tuple[str | None, str]:
@@ -35,11 +35,9 @@ def define_msrp_blob_asset(
             with io.StringIO(newline="") as buffer:
                 writer = csv.writer(buffer)
                 writer.writerows(rows)
-                blob_client = (
-                    azure_blob_resource.get_blob_service_client().get_blob_client(
-                        container=container_name,
-                        blob=blob_name,
-                    )
+                blob_client = blob_resource.get_blob_service_client().get_blob_client(
+                    container=container_name,
+                    blob=blob_name,
                 )
                 blob_client.upload_blob(
                     buffer.getvalue(),
@@ -62,7 +60,7 @@ def define_msrp_blob_asset(
                     cursor.execute(sql)
                     header = tuple(column[0] for column in cursor.description)
                     (container_name, blob_name) = _upload_blob(
-                        azure_blob_resource,
+                        blob_resource,
                         [header],
                         True,
                     )
@@ -70,7 +68,7 @@ def define_msrp_blob_asset(
                         rows = cursor.fetchmany(rows_to_fetch)
                         if not rows:
                             break
-                        _upload_blob(azure_blob_resource, rows, False)
+                        _upload_blob(blob_resource, rows, False)
 
             return (container_name, blob_name)
 
