@@ -10,16 +10,16 @@ rdp_job = define_asset_job(
     selection=AssetSelection.key_prefixes("rdp"),
     tags={"target_prefix": "rdp"},
 )
-erp_active_job = define_asset_job(
-    "erp_active_job",
-    selection=AssetSelection.key_prefixes("erp")
+cerp_active_job = define_asset_job(
+    "cerp_active_job",
+    selection=AssetSelection.key_prefixes("cerp")
     & AssetSelection.tag("status", "active"),
-    tags={"target_prefix": "erp", "target_tag": "active"},
+    tags={"target_prefix": "cerp", "target_tag": "active"},
 )
-erp_all_job = define_asset_job(
-    "erp_all_job",
-    selection=AssetSelection.key_prefixes("erp"),
-    tags={"target_prefix": "erp"},
+cerp_all_job = define_asset_job(
+    "cerp_all_job",
+    selection=AssetSelection.key_prefixes("cerp"),
+    tags={"target_prefix": "cerp"},
 )
 dbt_job = define_asset_job(
     "dbt_job",
