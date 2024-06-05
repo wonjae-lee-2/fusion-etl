@@ -14,7 +14,7 @@ totp_counter = pyotp.TOTP(EnvVar("TOTP_SECRET_KEY").get_value())
 
 
 class BIPublisherResource(ConfigurableResource):
-    oracle_analytics_publisher_url: str
+    bi_publisher_url: str
     unhcr_email: str
     unhcr_password: str
 
@@ -33,7 +33,7 @@ class BIPublisherResource(ConfigurableResource):
     def _authenticate(self, browser: Browser) -> BrowserContext:
         context = browser.new_context()
         page = context.new_page()
-        page.goto(self.oracle_analytics_publisher_url)
+        page.goto(self.bi_publisher_url)
         page.get_by_role("button", name="Company Single Sign-On").click()
         page.get_by_placeholder("username@unhcr.org").fill(self.unhcr_email)
         page.get_by_role("button", name="Next").click()
@@ -43,5 +43,5 @@ class BIPublisherResource(ConfigurableResource):
         page.get_by_role("button", name="Verify").click()
         page.get_by_role("button", name="Yes").click()
         page.wait_for_load_state("domcontentloaded")
-        page.goto(self.oracle_analytics_publisher_url)
+        page.goto(self.bi_publisher_url)
         return context

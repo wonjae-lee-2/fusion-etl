@@ -59,7 +59,7 @@ blob_resource = AzBlobResource(
     storage_access_key=EnvVar("AZURE_STORAGE_ACCESS_KEY"),
 )
 erp_resource = BIPublisherResource(
-    oracle_analytics_publisher_url=EnvVar("ORACLE_ANALYTICS_PUBLISHER_URL"),
+    bi_publisher_url=EnvVar("BI_PUBLISHER_URL"),
     unhcr_email=EnvVar("UNHCR_EMAIL"),
     unhcr_password=EnvVar("UNHCR_PASSWORD"),
 )
