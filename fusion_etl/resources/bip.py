@@ -13,7 +13,7 @@ erp_cookies_path = (
 totp_counter = pyotp.TOTP(EnvVar("TOTP_SECRET_KEY").get_value())
 
 
-class ERPResource(ConfigurableResource):
+class BIPublisherResource(ConfigurableResource):
     oracle_analytics_publisher_url: str
     unhcr_email: str
     unhcr_password: str

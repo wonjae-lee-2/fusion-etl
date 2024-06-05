@@ -8,7 +8,7 @@ from playwright.sync_api import Cookie
 
 from ..resources.azblob import AzBlobResource
 from ..resources.azsql import AzSQLResource
-from ..resources.erp import ERPResource
+from ..resources.bip import BIPublisherResource
 
 timestamps_path = (
     Path(EnvVar("SQLITE_STORAGE_BASE_DIR").get_value())
@@ -67,7 +67,7 @@ def define_erp_blob_asset(
         tags={"status": erp_mapping["status"]},
     )
     def _erp_blob_asset(
-        erp_resource: ERPResource,
+        erp_resource: BIPublisherResource,
         blob_resource: AzBlobResource,
     ) -> MaterializeResult:
         def _read_erp_cookies(erp_cookies_path: Path) -> list[Cookie]:
@@ -109,9 +109,7 @@ def define_erp_blob_asset(
             return (container_name, blob_name)
 
         download_content = _download_erp()
-        (container_name, blob_name) = _upload_blob(
-            blob_resource, download_content
-        )
+        (container_name, blob_name) = _upload_blob(blob_resource, download_content)
 
         return MaterializeResult(
             metadata={

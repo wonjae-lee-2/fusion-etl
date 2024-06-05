@@ -12,7 +12,7 @@ from .assets.rdp import define_rdp_blob_asset, define_rdp_src_asset
 from .assets.rdp_mappings import RDP_MAPPINGS
 from .resources.azblob import AzBlobResource
 from .resources.azsql import AzSQLResource
-from .resources.erp import ERPResource
+from .resources.bip import BIPublisherResource
 from .resources.finbi import FINBIResource
 from .resources.pbi import PowerBIResource
 from .sensors.dbt import dbt_run_status_sensor
@@ -58,7 +58,7 @@ blob_resource = AzBlobResource(
     account_url=EnvVar("AZURE_STORAGE_URL"),
     credential=EnvVar("AZURE_STORAGE_ACCESS_KEY"),
 )
-erp_resource = ERPResource(
+erp_resource = BIPublisherResource(
     oracle_analytics_publisher_url=EnvVar("ORACLE_ANALYTICS_PUBLISHER_URL"),
     unhcr_email=EnvVar("UNHCR_EMAIL"),
     unhcr_password=EnvVar("UNHCR_PASSWORD"),

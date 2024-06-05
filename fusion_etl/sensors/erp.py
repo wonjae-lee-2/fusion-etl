@@ -15,7 +15,7 @@ from playwright.sync_api import Cookie
 
 from ..assets.erp_mappings import ERP_MAPPINGS
 from ..jobs import erp_active_job, erp_all_job
-from ..resources.erp import ERPResource
+from ..resources.bip import BIPublisherResource
 
 timestamps_path = (
     Path(EnvVar("SQLITE_STORAGE_BASE_DIR").get_value())
@@ -113,7 +113,7 @@ def _get_last_output_id(erp_timestamp: dict[str, dict[str, str]]) -> str:
 
 @sensor(job=erp_active_job, minimum_interval_seconds=60 * 60)
 def erp_active_timestamp_sensor(
-    context: SensorEvaluationContext, erp_resource: ERPResource
+    context: SensorEvaluationContext, erp_resource: BIPublisherResource
 ) -> RunRequest | SkipReason:
     timestamps = _read_timestamps()
     previous_erp_timestamp = timestamps.get("erp")
@@ -141,7 +141,7 @@ def erp_active_timestamp_sensor(
 
 @sensor(job=erp_all_job)
 def erp_all_timestamp_sensor(
-    context: SensorEvaluationContext, erp_resource: ERPResource
+    context: SensorEvaluationContext, erp_resource: BIPublisherResource
 ) -> RunRequest | SkipReason:
     erp_cookies = erp_resource.refresh_cookies()
     current_erp_timestamp = _get_erp_timestamp(erp_cookies, ERP_MAPPINGS)
