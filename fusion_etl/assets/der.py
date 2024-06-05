@@ -8,7 +8,7 @@ from dagster import AssetsDefinition, EnvVar, MaterializeResult, asset
 
 from ..resources.azblob import AzBlobResource
 from ..resources.azsql import AzSQLResource
-from ..resources.der import DERResource
+from ..resources.pbi import PowerBIResource
 
 
 def _get_der_timestamp_date() -> str:
@@ -48,10 +48,10 @@ def define_der_blob_asset(
         compute_kind="azure",
     )
     def _der_blob_asset(
-        der_resource: DERResource,
+        der_resource: PowerBIResource,
         blob_resource: AzBlobResource,
     ) -> MaterializeResult:
-        def _get_row_count(der_resource: DERResource) -> int:
+        def _get_row_count(der_resource: PowerBIResource) -> int:
             source_table = der_mapping["source"]
             dax = f"""
                 EVALUATE
@@ -61,7 +61,7 @@ def define_der_blob_asset(
             row_count = der_resource.execute(dax)
             return row_count[0]["[Row_Count]"]
 
-        def _get_column_count(der_resource: DERResource) -> int:
+        def _get_column_count(der_resource: PowerBIResource) -> int:
             source_table = der_mapping["source"]
             dax = f"""
                 EVALUATE
@@ -77,7 +77,7 @@ def define_der_blob_asset(
             column_name = match.group(1) if match else key
             return column_name
 
-        def _query_dataset(der_resource: DERResource) -> list[dict]:
+        def _query_dataset(der_resource: PowerBIResource) -> list[dict]:
             source_table = der_mapping["source"]
             dax = """
                 EVALUATE

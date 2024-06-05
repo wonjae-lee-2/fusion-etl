@@ -9,7 +9,7 @@ from dagster import (
 )
 
 from ..jobs import der_job
-from ..resources.der import DERResource
+from ..resources.pbi import PowerBIResource
 
 timestamps_path = (
     Path(EnvVar("SQLITE_STORAGE_BASE_DIR").get_value())
@@ -30,7 +30,7 @@ def _read_timestamps() -> dict:
 
 @sensor(job=der_job, minimum_interval_seconds=60 * 60)
 def der_timestamp_sensor(
-    context: SensorEvaluationContext, der_resource: DERResource
+    context: SensorEvaluationContext, der_resource: PowerBIResource
 ) -> RunRequest:
     timestamps = _read_timestamps()
     previous_der_timestamp = timestamps.get("der")

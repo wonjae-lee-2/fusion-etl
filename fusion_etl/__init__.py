@@ -12,9 +12,9 @@ from .assets.rdp import define_rdp_blob_asset, define_rdp_src_asset
 from .assets.rdp_mappings import RDP_MAPPINGS
 from .resources.azblob import AzBlobResource
 from .resources.azsql import AzSQLResource
-from .resources.der import DERResource
 from .resources.erp import ERPResource
 from .resources.msrp import MSRPResource
+from .resources.pbi import PowerBIResource
 from .sensors.dbt import dbt_run_status_sensor
 from .sensors.der import der_timestamp_sensor
 from .sensors.erp import erp_active_timestamp_sensor, erp_all_timestamp_sensor
@@ -76,7 +76,7 @@ msrp_resource = MSRPResource(
     msrp_login=EnvVar("MSRP_LOGIN"),
     msrp_password=EnvVar("MSRP_PASSWORD"),
 )
-der_resource = DERResource(
+der_resource = PowerBIResource(
     power_bi_credential_scope=EnvVar("POWER_BI_CREDENTIAL_SCOPE"),
     der_group_id=EnvVar("DER_GROUP_ID"),
     der_dataset_id=EnvVar("DER_DATASET_ID"),

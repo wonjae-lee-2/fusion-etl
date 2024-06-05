@@ -6,7 +6,7 @@ power_bi_history_uri = EnvVar("POWER_BI_HISTORY_URI").get_value()
 power_bi_query_uri = EnvVar("POWER_BI_QUERY_URI").get_value()
 
 
-class DERResource(ConfigurableResource):
+class PowerBIResource(ConfigurableResource):
     power_bi_credential_scope: str
     der_group_id: str
     der_dataset_id: str
