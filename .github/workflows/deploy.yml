@@ -40,7 +40,6 @@ jobs:
           POWER_BI_CREDENTIAL_SCOPE: ${{ secrets.POWER_BI_CREDENTIAL_SCOPE}}
           DER_GROUP_ID: ${{ secrets.DER_GROUP_ID}}
           DER_DATASET_ID: ${{ secrets.DER_DATASET_ID}}
-          POWER_BI_HISTORY_URI: ${{ secrets.POWER_BI_HISTORY_URI}}
           POWER_BI_QUERY_URI: ${{ secrets.POWER_BI_QUERY_URI}}
         run: |
           Set-Content -Path .env -Value "AZURE_DATABASE_CREDENTIAL_SCOPE=$env:AZURE_DATABASE_CREDENTIAL_SCOPE"
@@ -66,7 +65,6 @@ jobs:
           Add-Content -Path .env -Value "POWER_BI_CREDENTIAL_SCOPE=$env:POWER_BI_CREDENTIAL_SCOPE"
           Add-Content -Path .env -Value "DER_GROUP_ID=$env:DER_GROUP_ID"
           Add-Content -Path .env -Value "DER_DATASET_ID=$env:DER_DATASET_ID"
-          Add-Content -Path .env -Value "POWER_BI_HISTORY_URI=$env:POWER_BI_HISTORY_URI"
           Add-Content -Path .env -Value "POWER_BI_QUERY_URI=$env:POWER_BI_QUERY_URI"
 
       - name: Write azure cli credentials to file

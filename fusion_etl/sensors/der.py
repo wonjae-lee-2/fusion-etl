@@ -28,13 +28,23 @@ def _read_timestamps() -> dict:
     return timestamps
 
 
+def _get_last_timestamp(der_resource: PowerBIResource) -> str:
+    dax = """
+        EVALUATE
+        ROW ( "Timestamp", MAX ( FactIncomeWIP[DataRefreshDateTime] ) )
+    """
+
+    timestamp = der_resource.execute(dax)
+    return timestamp[0]["[Timestamp]"]
+
+
 @sensor(job=der_job, minimum_interval_seconds=60 * 60)
 def der_timestamp_sensor(
     context: SensorEvaluationContext, der_resource: PowerBIResource
 ) -> RunRequest:
     timestamps = _read_timestamps()
     previous_der_timestamp = timestamps.get("der")
-    current_der_timestamp = der_resource.get_last_timestamp()
+    current_der_timestamp = _get_last_timestamp(der_resource)
 
     if previous_der_timestamp != current_der_timestamp:
         timestamps["der"] = current_der_timestamp
