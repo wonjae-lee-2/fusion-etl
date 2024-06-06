@@ -67,3 +67,7 @@ dagster dev -h 0.0.0.0 -p 3000
 ### MSRP HCR_BIRCPT_MVW
 
 This table's RATE_DIV column has several 0E-8 which bulk insert cannot handle. You need to manually replace them with 0 before bulk insert.
+
+### BI Publisher jobs
+
+Some erp assets are split into one calendar year to reduce the number of rows returned. For those assets, you need to schedule reports with a job name that corresponds to the 'source' property in ERP_MAPPINGS. If not, the erp timestamp sensor cannot find the job.
