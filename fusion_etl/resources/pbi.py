@@ -8,20 +8,20 @@ power_bi_query_uri = EnvVar("POWER_BI_QUERY_URI").get_value()
 
 class PowerBIResource(ConfigurableResource):
     power_bi_credential_scope: str
-    der_group_id: str
-    der_dataset_id: str
+    group_id: str
+    dataset_id: str
 
     def execute(self, dax: str) -> list[dict]:
-        der_query_uri = power_bi_query_uri.format(
-            self.der_group_id,
-            self.der_dataset_id,
+        dataset_query_uri = power_bi_query_uri.format(
+            self.group_id,
+            self.dataset_id,
         )
         authorization_header = self._get_authorization_header()
         payload = {
             "queries": [{"query": dax}],
             "serializerSettings": {"includeNulls": True},
         }
-        r = requests.post(der_query_uri, headers=authorization_header, json=payload)
+        r = requests.post(dataset_query_uri, headers=authorization_header, json=payload)
         rows = r.json()["results"][0]["tables"][0]["rows"]
 
         return rows
