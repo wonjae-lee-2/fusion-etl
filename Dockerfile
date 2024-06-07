@@ -18,7 +18,7 @@ RUN mv ${DAGSTER_APP_DIR}/dagster.yaml ${DAGSTER_HOME} \
     && curl https://packages.microsoft.com/config/debian/12/prod.list | tee /etc/apt/sources.list.d/mssql-release.list \
     && apt-get update \
     && ACCEPT_EULA=Y apt-get install -y msodbcsql18 \
-    && apt-get install -y unixodbc-dev \
+    && apt-get install -y unixodbc-dev sqlite3 \
     && rm -rf /var/lib/apt/lists/*
 
 COPY azureProfile.json msal_token_cache.json /root/.azure/
