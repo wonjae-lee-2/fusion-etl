@@ -10,11 +10,15 @@ from .assets.msrp import define_msrp_blob_asset, define_msrp_src_asset
 from .assets.msrp_mappings import MSRP_MAPPINGS
 from .assets.rdp import define_rdp_blob_asset, define_rdp_src_asset
 from .assets.rdp_mappings import RDP_MAPPINGS
+from .assets.sp import define_sp_blob_asset, define_sp_src_asset
+from .assets.sp_mappings import SP_MAPPINGS
+from .jobs import sp_job
 from .resources.azblob import AzBlobResource
 from .resources.azsql import AzSQLResource
 from .resources.bip import BIPublisherResource
 from .resources.finbi import FINBIResource
 from .resources.pbi import PowerBIResource
+from .resources.sp import SharepointResource
 from .sensors.dbt import dbt_run_status_sensor
 from .sensors.der import der_timestamp_sensor
 from .sensors.erp import erp_active_timestamp_sensor, erp_all_timestamp_sensor
@@ -52,6 +56,13 @@ rdp_source_assets = [
     define_rdp_src_asset(rdp_mapping, EnvVar("DAGSTER_ENV"))
     for rdp_mapping in RDP_MAPPINGS
 ]
+sp_blob_assets = [
+    define_sp_blob_asset(sp_mapping, EnvVar("DAGSTER_ENV"))
+    for sp_mapping in SP_MAPPINGS
+]
+sp_source_assets = [
+    define_sp_src_asset(sp_mapping, EnvVar("DAGSTER_ENV")) for sp_mapping in SP_MAPPINGS
+]
 dbt_assets = load_assets_from_modules([dbt])
 
 blob_resource = AzBlobResource(
@@ -78,14 +89,18 @@ msrp_resource = FINBIResource(
 )
 der_resource = PowerBIResource(
     power_bi_credential_scope=EnvVar("POWER_BI_CREDENTIAL_SCOPE"),
-    der_group_id=EnvVar("DER_GROUP_ID"),
-    der_dataset_id=EnvVar("DER_DATASET_ID"),
+    group_id=EnvVar("DER_GROUP_ID"),
+    dataset_id=EnvVar("DER_DATASET_ID"),
 )
 rdp_resource = AzSQLResource(
     azure_database_credential_scope=EnvVar("AZURE_DATABASE_CREDENTIAL_SCOPE"),
     odbc_driver=EnvVar("ODBC_DRIVER"),
     server=EnvVar("RDP_SERVER"),
     database=EnvVar("RDP_DATABASE"),
+)
+sharepoint_resource = SharepointResource(
+    ms_graph_credential_scope=EnvVar("MS_GRAPH_CREDENTIAL_SCOPE"),
+    paru_site_id=EnvVar("PARU_SITE_ID"),
 )
 dbt_project_dir = EnvVar("DBT_PROJECT_DIR").get_value()
 dbt_resource = DbtCliResource(project_dir=dbt_project_dir)
@@ -101,8 +116,11 @@ defs = Definitions(
         *msrp_source_assets,
         *rdp_blob_assets,
         *rdp_source_assets,
+        *sp_blob_assets,
+        *sp_source_assets,
         *dbt_assets,
     ],
+    jobs=[sp_job],
     resources={
         "blob_resource": blob_resource,
         "erp_resource": erp_resource,
@@ -110,6 +128,7 @@ defs = Definitions(
         "msrp_resource": msrp_resource,
         "der_resource": der_resource,
         "rdp_resource": rdp_resource,
+        "sharepoint_resource": sharepoint_resource,
         "dbt_resource": dbt_resource,
     },
     sensors=[

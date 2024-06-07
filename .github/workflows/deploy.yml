@@ -41,6 +41,12 @@ jobs:
           DER_GROUP_ID: ${{ secrets.DER_GROUP_ID}}
           DER_DATASET_ID: ${{ secrets.DER_DATASET_ID}}
           POWER_BI_QUERY_URI: ${{ secrets.POWER_BI_QUERY_URI}}
+          MS_GRAPH_CREDENTIAL_SCOPE: ${{ secrets.MS_GRAPH_CREDENTIAL_SCOPE}}
+          PARU_SITE_ID: ${{ secrets.PARU_SITE_ID}}
+          SHAREPOINT_FILE_URI: ${{ secrets.SHAREPOINT_FILE_URI}}
+          SHAREPOINT_LIST_ROWS_URI: ${{ secrets.SHAREPOINT_LIST_ROWS_URI}}
+          SHAREPOINT_LIST_COLUMNS_URI: ${{ secrets.SHAREPOINT_LIST_COLUMNS_URI}}
+
         run: |
           Set-Content -Path .env -Value "AZURE_DATABASE_CREDENTIAL_SCOPE=$env:AZURE_DATABASE_CREDENTIAL_SCOPE"
           Add-Content -Path .env -Value "ODBC_DRIVER=$env:ODBC_DRIVER"
@@ -66,6 +72,11 @@ jobs:
           Add-Content -Path .env -Value "DER_GROUP_ID=$env:DER_GROUP_ID"
           Add-Content -Path .env -Value "DER_DATASET_ID=$env:DER_DATASET_ID"
           Add-Content -Path .env -Value "POWER_BI_QUERY_URI=$env:POWER_BI_QUERY_URI"
+          Add-Content -Path .env -Value "MS_GRAPH_CREDENTIAL_SCOPE=$env:MS_GRAPH_CREDENTIAL_SCOPE"
+          Add-Content -Path .env -Value "PARU_SITE_ID=$env:PARU_SITE_ID"
+          Add-Content -Path .env -Value "SHAREPOINT_FILE_URI=$env:SHAREPOINT_FILE_URI"
+          Add-Content -Path .env -Value "SHAREPOINT_LIST_ROWS_URI=$env:SHAREPOINT_LIST_ROWS_URI"
+          Add-Content -Path .env -Value "SHAREPOINT_LIST_COLUMNS_URI=$env:SHAREPOINT_LIST_COLUMNS_URI"
 
       - name: Write azure cli credentials to file
         shell: pwsh
