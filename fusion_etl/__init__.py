@@ -8,6 +8,8 @@ from .assets.erp import define_erp_blob_asset, define_erp_src_asset
 from .assets.erp_mappings import ERP_MAPPINGS
 from .assets.msrp import define_msrp_blob_asset, define_msrp_src_asset
 from .assets.msrp_mappings import MSRP_MAPPINGS
+from .assets.orion import define_orion_blob_asset, define_orion_src_asset
+from .assets.orion_mappings import ORION_MAPPINGS
 from .assets.rdp import define_rdp_blob_asset, define_rdp_src_asset
 from .assets.rdp_mappings import RDP_MAPPINGS
 from .assets.sp import define_sp_blob_asset, define_sp_src_asset
@@ -19,6 +21,7 @@ from .resources.bip import BIPublisherResource
 from .resources.finbi import FINBIResource
 from .resources.pbi import PowerBIResource
 from .resources.sp import SharepointResource
+from .schedules import orion_daily_schedule
 from .sensors.dbt import dbt_run_status_sensor
 from .sensors.der import der_timestamp_sensor
 from .sensors.erp import erp_active_timestamp_sensor, erp_all_timestamp_sensor
@@ -48,6 +51,14 @@ msrp_source_assets = [
     define_msrp_src_asset(msrp_mapping, EnvVar("DAGSTER_ENV"))
     for msrp_mapping in MSRP_MAPPINGS
 ]
+orion_blob_assets = [
+    define_orion_blob_asset(orion_mapping, EnvVar("DAGSTER_ENV"))
+    for orion_mapping in ORION_MAPPINGS
+]
+orion_source_assets = [
+    define_orion_src_asset(orion_mapping, EnvVar("DAGSTER_ENV"))
+    for orion_mapping in ORION_MAPPINGS
+]
 rdp_blob_assets = [
     define_rdp_blob_asset(rdp_mapping, EnvVar("DAGSTER_ENV"))
     for rdp_mapping in RDP_MAPPINGS
@@ -69,6 +80,11 @@ blob_resource = AzBlobResource(
     blob_storage_url=EnvVar("AZURE_BLOB_STORAGE_URL"),
     storage_access_key=EnvVar("AZURE_STORAGE_ACCESS_KEY"),
 )
+der_resource = PowerBIResource(
+    power_bi_credential_scope=EnvVar("POWER_BI_CREDENTIAL_SCOPE"),
+    group_id=EnvVar("DER_GROUP_ID"),
+    dataset_id=EnvVar("DER_DATASET_ID"),
+)
 erp_resource = BIPublisherResource(
     bi_publisher_url=EnvVar("BI_PUBLISHER_URL"),
     unhcr_email=EnvVar("UNHCR_EMAIL"),
@@ -87,10 +103,11 @@ msrp_resource = FINBIResource(
     msrp_login=EnvVar("MSRP_LOGIN"),
     msrp_password=EnvVar("MSRP_PASSWORD"),
 )
-der_resource = PowerBIResource(
-    power_bi_credential_scope=EnvVar("POWER_BI_CREDENTIAL_SCOPE"),
-    group_id=EnvVar("DER_GROUP_ID"),
-    dataset_id=EnvVar("DER_DATASET_ID"),
+orion_resource = AzSQLResource(
+    azure_database_credential_scope=EnvVar("AZURE_DATABASE_CREDENTIAL_SCOPE"),
+    odbc_driver=EnvVar("ODBC_DRIVER"),
+    server=EnvVar("ORION_SERVER"),
+    database=EnvVar("ORION_DATABASE"),
 )
 rdp_resource = AzSQLResource(
     azure_database_credential_scope=EnvVar("AZURE_DATABASE_CREDENTIAL_SCOPE"),
@@ -114,6 +131,8 @@ defs = Definitions(
         *erp_source_assets,
         *msrp_blob_assets,
         *msrp_source_assets,
+        *orion_blob_assets,
+        *orion_source_assets,
         *rdp_blob_assets,
         *rdp_source_assets,
         *sp_blob_assets,
@@ -123,14 +142,16 @@ defs = Definitions(
     jobs=[sp_job],
     resources={
         "blob_resource": blob_resource,
+        "der_resource": der_resource,
         "erp_resource": erp_resource,
         "fusion_resource": fusion_resource,
         "msrp_resource": msrp_resource,
-        "der_resource": der_resource,
+        "orion_resource": orion_resource,
         "rdp_resource": rdp_resource,
         "sharepoint_resource": sharepoint_resource,
         "dbt_resource": dbt_resource,
     },
+    schedules=[orion_daily_schedule],
     sensors=[
         der_timestamp_sensor,
         erp_active_timestamp_sensor,
