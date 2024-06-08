@@ -24,24 +24,10 @@ def define_orion_blob_asset(
         orion_resource: AzSQLResource,
         blob_resource: AzBlobResource,
     ) -> MaterializeResult:
-        def _query_orion(orion_resource: AzSQLResource) -> list[tuple[int | str, ...]]:
-            source_table = orion_mapping["source"]
-            sql = f"""
-                SELECT * FROM {source_table};
-            """
-
-            with orion_resource.connect() as conn:
-                with conn.cursor() as cursor:
-                    cursor.execute(sql)
-                    header = tuple(column[0] for column in cursor.description)
-                    rows = cursor.fetchall()
-                    rows_with_header = [header] + rows
-
-            return rows_with_header
-
         def _upload_blob(
             blob_resource: AzBlobResource,
-            rows_with_header: list[tuple[int | str, ...]],
+            rows: list[tuple[int | str, ...]],
+            overwrite_flag: bool,
         ) -> tuple[str | None, str]:
             container_name = dagster_env.get_value()
             timestamp = datetime.today().strftime("%Y-%m-%d")
@@ -49,21 +35,45 @@ def define_orion_blob_asset(
 
             with io.StringIO(newline="") as buffer:
                 writer = csv.writer(buffer)
-                writer.writerows(rows_with_header)
+                writer.writerows(rows)
                 blob_client = blob_resource.get_blob_service_client().get_blob_client(
                     container=container_name,
                     blob=blob_name,
                 )
                 blob_client.upload_blob(
                     buffer.getvalue(),
+                    blob_type="AppendBlob",
                     encoding="utf-8",
-                    overwrite=True,
+                    overwrite=overwrite_flag,
                 )
 
             return (container_name, blob_name)
 
-        rows_with_header = _query_orion(orion_resource)
-        (container_name, blob_name) = _upload_blob(blob_resource, rows_with_header)
+        def _sync_orion(orion_resource: AzSQLResource) -> tuple[str | None, str]:
+            source_table = orion_mapping["source"]
+            sql = f"""
+                SELECT * FROM {source_table};
+            """
+            rows_to_fetch = 200_000
+
+            with orion_resource.connect() as conn:
+                with conn.cursor() as cursor:
+                    cursor.execute(sql)
+                    header = tuple(column[0] for column in cursor.description)
+                    (container_name, blob_name) = _upload_blob(
+                        blob_resource,
+                        [header],
+                        True,
+                    )
+                    while True:
+                        rows = cursor.fetchmany(rows_to_fetch)
+                        if not rows:
+                            break
+                        _upload_blob(blob_resource, rows, False)
+
+            return (container_name, blob_name)
+
+        (container_name, blob_name) = _sync_orion(orion_resource)
 
         return MaterializeResult(
             metadata={
