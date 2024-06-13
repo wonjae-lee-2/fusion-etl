@@ -17,4 +17,4 @@ services:
 
 volumes:
   prod:
-    driver: local
+    external: true

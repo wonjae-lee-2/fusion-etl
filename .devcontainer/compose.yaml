@@ -19,4 +19,4 @@ services:
 
 volumes:
   dev:
-    driver: local
+    external: true
