@@ -10,11 +10,11 @@ services:
     restart: unless-stopped
     volumes:
       - type: volume
-        source: prod
+        source: fusion_etl_prod
         target: /opt/dagster/storage/
     ports:
       - "3000:3000"
 
 volumes:
-  prod:
+  fusion_etl_prod:
     external: true
