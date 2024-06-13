@@ -10,7 +10,7 @@ dbt_core:
       schema: dbt_dev
       authentication: CLI
       threads: 12
-    prd:
+    prod:
       type: sqlserver
       driver: "{{ env_var('ODBC_DRIVER') }}"
       server: "{{ env_var('FUSION_SERVER') }}"
