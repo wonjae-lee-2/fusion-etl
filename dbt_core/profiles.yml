@@ -7,7 +7,7 @@ dbt_core:
       server: "{{ env_var('FUSION_SERVER') }}"
       port: 1433
       database: "{{ env_var('FUSION_DATABASE') }}"
-      schema: dev
+      schema: dbt_dev
       authentication: CLI
       threads: 12
     prd:
@@ -16,6 +16,6 @@ dbt_core:
       server: "{{ env_var('FUSION_SERVER') }}"
       port: 1433
       database: "{{ env_var('FUSION_DATABASE') }}"
-      schema: prd
+      schema: dbt_prod
       authentication: CLI
       threads: 12
