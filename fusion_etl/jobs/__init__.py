@@ -18,8 +18,8 @@ erp_all_job = define_asset_job(
 )
 orion_job = define_asset_job(
     "orion_job",
-    selection=AssetSelection.key_prefixes("ori"),
-    tags={"target_prefix": "ori"},
+    selection=AssetSelection.key_prefixes("orion"),
+    tags={"target_prefix": "orion"},
 )
 rdp_job = define_asset_job(
     "rdp_job",

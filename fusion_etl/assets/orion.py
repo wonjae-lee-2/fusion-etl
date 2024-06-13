@@ -12,11 +12,11 @@ def define_orion_blob_asset(
     orion_mapping: dict[str, str],
     dagster_env: EnvVar,
 ) -> AssetsDefinition:
-    asset_name = f"ori_blob__{orion_mapping['name']}"
+    asset_name = f"orion_blob__{orion_mapping['name']}"
 
     @asset(
-        key_prefix="ori",
-        group_name="ori_blob",
+        key_prefix="orion",
+        group_name="orion_blob",
         name=asset_name,
         compute_kind="azure",
     )
@@ -89,15 +89,15 @@ def define_orion_src_asset(
     orion_mapping: dict[str, str],
     dagster_env: EnvVar,
 ) -> AssetsDefinition:
-    asset_name = f"ori_src__{orion_mapping['name']}"
-    upstream_asset_name = f"ori_blob__{orion_mapping['name']}"
+    asset_name = f"orion_src__{orion_mapping['name']}"
+    upstream_asset_name = f"orion_blob__{orion_mapping['name']}"
 
     @asset(
-        key_prefix="ori",
-        group_name="ori_src",
+        key_prefix="orion",
+        group_name="orion_src",
         name=asset_name,
         compute_kind="sql",
-        deps=[["ori", upstream_asset_name]],
+        deps=[["orion", upstream_asset_name]],
     )
     def _orion_src_asset(
         fusion_resource: AzSQLResource,
