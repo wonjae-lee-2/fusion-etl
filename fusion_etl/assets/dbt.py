@@ -9,7 +9,7 @@ dagster_env = EnvVar("DAGSTER_ENV").get_value()
 
 dbt_resource = DbtCliResource(project_dir=dbt_project_dir)
 dbt_manifest_path = (
-    dbt_resource.cli(["parse", "--quiet", "-t", dagster_env])
+    dbt_resource.cli(["compile", "--quiet", "-t", dagster_env])
     .wait()
     .target_path.joinpath("manifest.json")
 )
@@ -25,6 +25,9 @@ class CustomDagsterDbtTranslator(DagsterDbtTranslator):
             return AssetKey(f"{source_name}_src__{name}").with_prefix(source_name)
         else:
             return super().get_asset_key(dbt_resource_props).with_prefix("dbt")
+
+    def get_description(self, dbt_resource_props: Mapping[str, Any]) -> str:
+        return dbt_resource_props["compiled_code"]
 
 
 @dbt_assets(
