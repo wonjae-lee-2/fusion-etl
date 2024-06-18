@@ -23,7 +23,7 @@ from .resources.finbi import FINBIResource
 from .resources.pbi import PowerBIResource
 from .resources.sp import SharepointResource
 from .schedules import orion_daily_schedule
-from .sensors.dbt import dbt_run_status_sensor
+from .sensors.dbt import dbt_run_success_sensor
 from .sensors.der import der_timestamp_sensor
 from .sensors.erp import erp_active_timestamp_sensor, erp_all_timestamp_sensor
 from .sensors.rdp import rdp_timestamp_sensor
@@ -163,6 +163,6 @@ defs = Definitions(
         erp_active_timestamp_sensor,
         erp_all_timestamp_sensor,
         rdp_timestamp_sensor,
-        dbt_run_status_sensor,
+        dbt_run_success_sensor,
     ],
 )
