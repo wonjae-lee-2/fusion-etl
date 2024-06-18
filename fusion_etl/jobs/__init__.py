@@ -1,6 +1,8 @@
-from dagster import AssetSelection, define_asset_job, job
+from dagster import AssetSelection, RunConfig, define_asset_job, job
 
 from ..ops import send_slack_message
+
+MAX_CONCURENT_OPS = 11
 
 der_job = define_asset_job(
     "der_job",
@@ -21,6 +23,9 @@ erp_all_job = define_asset_job(
 orion_job = define_asset_job(
     "orion_job",
     selection=AssetSelection.key_prefixes("orion"),
+    config=RunConfig(
+        execution={"config": {"multiprocess": {"max_concurrent": MAX_CONCURENT_OPS}}}
+    ),
     tags={"target_prefix": "orion"},
 )
 rdp_job = define_asset_job(
