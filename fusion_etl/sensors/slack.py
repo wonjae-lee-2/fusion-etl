@@ -13,6 +13,7 @@ from ..jobs import (
     der_job,
     erp_active_job,
     erp_all_job,
+    orion_job,
     rdp_job,
     send_slack_message_job,
     sp_job,
@@ -22,7 +23,15 @@ from ..ops import MessageConfig
 
 @run_status_sensor(
     run_status=DagsterRunStatus.SUCCESS,
-    monitored_jobs=[der_job, erp_active_job, erp_all_job, rdp_job, sp_job, dbt_job],
+    monitored_jobs=[
+        der_job,
+        erp_active_job,
+        erp_all_job,
+        orion_job,
+        rdp_job,
+        sp_job,
+        dbt_job,
+    ],
     request_job=send_slack_message_job,
 )
 def slack_run_success_sensor(context: RunStatusSensorContext) -> RunRequest:
@@ -39,7 +48,15 @@ def slack_run_success_sensor(context: RunStatusSensorContext) -> RunRequest:
 
 @run_status_sensor(
     run_status=DagsterRunStatus.FAILURE,
-    monitored_jobs=[der_job, erp_active_job, erp_all_job, rdp_job, sp_job, dbt_job],
+    monitored_jobs=[
+        der_job,
+        erp_active_job,
+        erp_all_job,
+        orion_job,
+        rdp_job,
+        sp_job,
+        dbt_job,
+    ],
     request_job=send_slack_message_job,
 )
 def slack_run_failure_sensor(context: RunStatusSensorContext) -> RunRequest:
