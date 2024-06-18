@@ -48,6 +48,7 @@ jobs:
           SHAREPOINT_LIST_COLUMNS_URI: ${{ secrets.SHAREPOINT_LIST_COLUMNS_URI}}
           ORION_SERVER: ${{ secrets.ORION_SERVER}}
           ORION_DATABASE: ${{ secrets.ORION_DATABASE}}
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN}}
 
         run: |
           Set-Content -Path .env -Value "AZURE_DATABASE_CREDENTIAL_SCOPE=$env:AZURE_DATABASE_CREDENTIAL_SCOPE"
@@ -81,6 +82,7 @@ jobs:
           Add-Content -Path .env -Value "SHAREPOINT_LIST_COLUMNS_URI=$env:SHAREPOINT_LIST_COLUMNS_URI"
           Add-Content -Path .env -Value "ORION_SERVER=$env:ORION_SERVER"
           Add-Content -Path .env -Value "ORION_DATABASE=$env:ORION_DATABASE"
+          Add-Content -Path .env -Value "SLACK_BOT_TOKEN=$env:SLACK_BOT_TOKEN"
 
       - name: Write azure cli credentials to file
         shell: pwsh

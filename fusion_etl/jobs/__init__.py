@@ -1,4 +1,6 @@
-from dagster import AssetSelection, define_asset_job
+from dagster import AssetSelection, define_asset_job, job
+
+from ..ops import send_slack_message
 
 der_job = define_asset_job(
     "der_job",
@@ -36,3 +38,8 @@ dbt_job = define_asset_job(
     selection=AssetSelection.key_prefixes("dbt"),
     tags={"target_prefix": "dbt"},
 )
+
+
+@job
+def send_slack_message_job():
+    send_slack_message()

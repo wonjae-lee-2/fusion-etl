@@ -16,6 +16,7 @@ setup(
         "dbt-sqlserver",
         "pyotp",
         "requests",
+        "dagster-slack",
     ],
     extras_require={"dev": ["pytest", "ruff", "sqlfluff"]},
 )

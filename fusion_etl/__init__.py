@@ -1,5 +1,6 @@
 from dagster import Definitions, EnvVar, load_assets_from_modules
 from dagster_dbt import DbtCliResource
+from dagster_slack import SlackResource
 
 from .assets import dbt
 from .assets.der import define_der_blob_asset, define_der_src_asset
@@ -14,7 +15,7 @@ from .assets.rdp import define_rdp_blob_asset, define_rdp_src_asset
 from .assets.rdp_mappings import RDP_MAPPINGS
 from .assets.sp import define_sp_blob_asset, define_sp_src_asset
 from .assets.sp_mappings import SP_MAPPINGS
-from .jobs import sp_job
+from .jobs import send_slack_message_job, sp_job
 from .resources.azblob import AzBlobResource
 from .resources.azsql import AzSQLResource
 from .resources.bip import BIPublisherResource
@@ -26,6 +27,7 @@ from .sensors.dbt import dbt_run_status_sensor
 from .sensors.der import der_timestamp_sensor
 from .sensors.erp import erp_active_timestamp_sensor, erp_all_timestamp_sensor
 from .sensors.rdp import rdp_timestamp_sensor
+from .sensors.slack import slack_run_failure_sensor, slack_run_success_sensor
 
 der_blob_assets = [
     define_der_blob_asset(der_mapping, EnvVar("DAGSTER_ENV"))
@@ -121,6 +123,7 @@ sharepoint_resource = SharepointResource(
 )
 dbt_project_dir = EnvVar("DBT_PROJECT_DIR").get_value()
 dbt_resource = DbtCliResource(project_dir=dbt_project_dir)
+slack_resource = SlackResource(token=EnvVar("SLACK_BOT_TOKEN"))
 
 
 defs = Definitions(
@@ -139,7 +142,7 @@ defs = Definitions(
         *sp_source_assets,
         *dbt_assets,
     ],
-    jobs=[sp_job],
+    jobs=[send_slack_message_job, sp_job],
     resources={
         "blob_resource": blob_resource,
         "der_resource": der_resource,
@@ -150,10 +153,13 @@ defs = Definitions(
         "rdp_resource": rdp_resource,
         "sharepoint_resource": sharepoint_resource,
         "dbt_resource": dbt_resource,
+        "slack_resource": slack_resource,
     },
     schedules=[orion_daily_schedule],
     sensors=[
         der_timestamp_sensor,
+        slack_run_failure_sensor,
+        slack_run_success_sensor,
         erp_active_timestamp_sensor,
         erp_all_timestamp_sensor,
         rdp_timestamp_sensor,

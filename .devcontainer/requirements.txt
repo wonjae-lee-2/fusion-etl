@@ -10,6 +10,8 @@ dagster==1.7.4
     # via fusion-etl (setup.py)
 dagster-dbt==0.23.4
     # via fusion-etl (setup.py)
+dagster-slack<=0.23.10
+    # via fusion-etl (setup.py)
 dagster-webserver==1.7.4
     # via fusion-etl (setup.py)
 dbt-sqlserver==1.7.4
