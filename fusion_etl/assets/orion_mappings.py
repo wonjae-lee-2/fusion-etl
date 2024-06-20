@@ -64,9 +64,4 @@ ORION_MAPPINGS = [
         "source": "[model].[Population_Statistics]",
         "target": "[ori].[Population_Statistics]",
     },
-    {
-        "name": "Registered_Population",
-        "source": "[model].[Registered_Population]",
-        "target": "[ori].[Registered_Population]",
-    },
 ]
