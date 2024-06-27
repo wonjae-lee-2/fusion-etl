@@ -1,15 +1,9 @@
 ERP_MAPPINGS = [
     {
-        "name": "bc_budget_targets_23",
+        "name": "bc_budget_targets",
         "status": "inactive",
-        "source": "bc_budget_targets_23",
-        "target": "[erp].[bc_budget_targets_23]",
-    },
-    {
-        "name": "bc_budget_targets_24",
-        "status": "active",
-        "source": "bc_budget_targets_24",
-        "target": "[erp].[bc_budget_targets_24]",
+        "source": "bc_budget_targets",
+        "target": "[erp].[bc_budget_targets]",
     },
     {
         "name": "gl_account_categories",
@@ -60,16 +54,10 @@ ERP_MAPPINGS = [
         "target": "[erp].[ppm_budget_situations]",
     },
     {
-        "name": "ppm_committed_costs_23",
-        "status": "inactive",
-        "source": "ppm_committed_costs_23",
-        "target": "[erp].[ppm_committed_costs_23]",
-    },
-    {
-        "name": "ppm_committed_costs_24",
+        "name": "ppm_committed_costs",
         "status": "active",
-        "source": "ppm_committed_costs_24",
-        "target": "[erp].[ppm_committed_costs_24]",
+        "source": "ppm_committed_costs",
+        "target": "[erp].[ppm_committed_costs]",
     },
     {
         "name": "ppm_expenditure_categories",
