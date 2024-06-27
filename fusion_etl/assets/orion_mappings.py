@@ -45,16 +45,6 @@ ORION_MAPPINGS = [
         "target": "[ori].[Dim_Sexes]",
     },
     {
-        "name": "Interagency_Population",
-        "source": "[model].[Interagency_Population]",
-        "target": "[ori].[Interagency_Population]",
-    },
-    {
-        "name": "Nowcasting",
-        "source": "[model].[Nowcasting]",
-        "target": "[ori].[Nowcasting]",
-    },
-    {
         "name": "Population_Planning",
         "source": "[model].[Population_Planning]",
         "target": "[ori].[Population_Planning]",
