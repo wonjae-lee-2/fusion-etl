@@ -1,478 +1,226 @@
 version: 2
 
 models:
-  - name: base_erp__fnd_lookup_values_tl
+  - name: stg_erp__bc_budget_targets
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
-            - lookup_type
-            - lookup_code
-
-  - name: base_erp__fnd_vs_values_b
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
-            - attribute_category
-            - value
-
-  - name: base_erp__gl_code_combinations
+            - header_id
+            - line_number
     columns:
-      - name: gl_segment_id
+      - name: fund_code
         tests:
-          - unique
-          - not_null
+          - relationships:
+              to: ref('stg_erp__gl_funds')
+              field: fund_code
+      - name: cost_center_code
+        tests:
+          - relationships:
+              to: ref('stg_erp__gl_cost_centers')
+              field: cost_center_code
+      - name: budget_category_group_code
+        tests:
+          - relationships:
+              to: ref('stg_erp__gl_budget_categories')
+              field: budget_category_group_code
+      - name: budget_situation_code
+        tests:
+          - relationships:
+              to: ref('stg_erp__ppm_budget_situations')
+              field: budget_situation_code
 
-  - name: base_erp__gl_seg_val_hier_cf
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
-            - tree_version_name
-            - dep25_pk1_value
-    columns:
-      - name: dep25_pk1_value
-        tests:
-          - relationships:
-              to: ref('base_erp__fnd_vs_values_b')
-              field: value
-      - name: dep25_pk2_value
-        tests:
-          - relationships:
-              to: ref('base_erp__fnd_vs_values_b')
-              field: attribute_category
-      - name: dep26_pk1_value
-        tests:
-          - relationships:
-              to: ref('base_erp__fnd_vs_values_b')
-              field: value
-      - name: dep26_pk2_value
-        tests:
-          - relationships:
-              to: ref('base_erp__fnd_vs_values_b')
-              field: attribute_category
-      - name: dep27_pk1_value
-        tests:
-          - relationships:
-              to: ref('base_erp__fnd_vs_values_b')
-              field: value
-      - name: dep27_pk2_value
-        tests:
-          - relationships:
-              to: ref('base_erp__fnd_vs_values_b')
-              field: attribute_category
-      - name: dep28_pk1_value
-        tests:
-          - relationships:
-              to: ref('base_erp__fnd_vs_values_b')
-              field: value
-      - name: dep28_pk2_value
-        tests:
-          - relationships:
-              to: ref('base_erp__fnd_vs_values_b')
-              field: attribute_category
-      - name: dep29_pk1_value
-        tests:
-          - relationships:
-              to: ref('base_erp__fnd_vs_values_b')
-              field: value
-      - name: dep29_pk2_value
-        tests:
-          - relationships:
-              to: ref('base_erp__fnd_vs_values_b')
-              field: attribute_category
-      - name: dep30_pk1_value
-        tests:
-          - relationships:
-              to: ref('base_erp__fnd_vs_values_b')
-              field: value
-      - name: dep30_pk2_value
-        tests:
-          - relationships:
-              to: ref('base_erp__fnd_vs_values_b')
-              field: attribute_category
-
-  - name: base_erp__hr_all_organization_units_f
-    columns:
-      - name: organization_id
-        tests:
-          - unique
-          - not_null
-
-  - name: base_erp__pjf_exp_categories_tl
-    columns:
-      - name: expenditure_category_id
-        tests:
-          - unique
-          - not_null
-
-  - name: base_erp__pjf_exp_types_b
-    columns:
-      - name: expenditure_type_id
-        tests:
-          - unique
-          - not_null
-      - name: expenditure_category_id
-        tests:
-          - relationships:
-              to: ref('base_erp__pjf_exp_categories_tl')
-              field: expenditure_category_id
-
-  - name: base_erp__pjf_proj_elements_b
-    columns:
-      - name: task_id
-        tests:
-          - unique
-          - not_null
-
-  - name: base_erp__pjf_projects_all_b
-    columns:
-      - name: project_id
-        tests:
-          - unique
-          - not_null
-
-  - name: base_erp__pjf_txn_document_b
-    columns:
-      - name: document_id
-        tests:
-          - unique
-          - not_null
-      - name: document_code
-        tests:
-          - unique
-          - not_null
-      - name: source_id
-        tests:
-          - relationships:
-              to: ref('base_erp__pjf_txn_sources_b')
-              field: source_id
-
-  - name: base_erp__pjf_txn_sources_b
-    columns:
-      - name: source_id
-        tests:
-          - unique
-          - not_null
-      - name: source_code
-        tests:
-          - unique
-          - not_null
-
-  - name: base_erp__poz_suppliers
-    columns:
-      - name: vendor_id
-        tests:
-          - unique
-          - not_null
-
-  - name: base_erp__xcc_balance_activities_22
-    columns:
-      - name: activity_type_code
-        tests:
-          - relationships:
-              to: ref('base_erp__fnd_lookup_values_tl')
-              field: lookup_code
-      - name: balance_type_code
-        tests:
-          - relationships:
-              to: ref('base_erp__fnd_lookup_values_tl')
-              field: lookup_code
-      - name: balance_subtype_code
-        tests:
-          - relationships:
-              to: ref('base_erp__fnd_lookup_values_tl')
-              field: lookup_code
-      - name: transaction_type_code
-        tests:
-          - relationships:
-              to: ref('base_erp__fnd_lookup_values_tl')
-              field: lookup_code
-      - name: transaction_subtype_code
-        tests:
-          - relationships:
-              to: ref('base_erp__fnd_lookup_values_tl')
-              field: lookup_code
-      - name: transaction_action_code
-        tests:
-          - relationships:
-              to: ref('base_erp__fnd_lookup_values_tl')
-              field: lookup_code
-      - name: destination_type_code
-        tests:
-          - relationships:
-              to: ref('base_erp__fnd_lookup_values_tl')
-              field: lookup_code
-      - name: liquidation_transaction_type_code
-        tests:
-          - relationships:
-              to: ref('base_erp__fnd_lookup_values_tl')
-              field: lookup_code
-      - name: ppm_source_code
-        tests:
-          - relationships:
-              to: ref('base_erp__pjf_txn_sources_b')
-              field: source_code
-      - name: ppm_document_code
-        tests:
-          - relationships:
-              to: ref('base_erp__pjf_txn_document_b')
-              field: document_code
-      - name: bc_segment_id
-        tests:
-          - relationships:
-              to: ref('base_erp__xcc_budget_accounts')
-              field: bc_segment_id
-      - name: gl_segment_id
-        tests:
-          - relationships:
-              to: ref('base_erp__gl_code_combinations')
-              field: gl_segment_id
-      - name: pjc_project_id
-        tests:
-          - relationships:
-              to: ref('base_erp__pjf_projects_all_b')
-              field: project_id
-      - name: pjc_task_id
-        tests:
-          - relationships:
-              to: ref('base_erp__pjf_proj_elements_b')
-              field: task_id
-      - name: pjc_expenditure_type_id
-        tests:
-          - relationships:
-              to: ref('base_erp__pjf_exp_types_b')
-              field: expenditure_type_id
-      - name: pjc_organization_id
-        tests:
-          - relationships:
-              to: ref('base_erp__hr_all_organization_units_f')
-              field: organization_id
-      - name: vendor_id
-        tests:
-          - relationships:
-              to: ref('base_erp__poz_suppliers')
-              field: vendor_id
-
-  - name: base_erp__xcc_balance_activities_23
-    columns:
-      - name: activity_type_code
-        tests:
-          - relationships:
-              to: ref('base_erp__fnd_lookup_values_tl')
-              field: lookup_code
-      - name: balance_type_code
-        tests:
-          - relationships:
-              to: ref('base_erp__fnd_lookup_values_tl')
-              field: lookup_code
-      - name: balance_subtype_code
-        tests:
-          - relationships:
-              to: ref('base_erp__fnd_lookup_values_tl')
-              field: lookup_code
-      - name: transaction_type_code
-        tests:
-          - relationships:
-              to: ref('base_erp__fnd_lookup_values_tl')
-              field: lookup_code
-      - name: transaction_subtype_code
-        tests:
-          - relationships:
-              to: ref('base_erp__fnd_lookup_values_tl')
-              field: lookup_code
-      - name: transaction_action_code
-        tests:
-          - relationships:
-              to: ref('base_erp__fnd_lookup_values_tl')
-              field: lookup_code
-      - name: destination_type_code
-        tests:
-          - relationships:
-              to: ref('base_erp__fnd_lookup_values_tl')
-              field: lookup_code
-      - name: liquidation_transaction_type_code
-        tests:
-          - relationships:
-              to: ref('base_erp__fnd_lookup_values_tl')
-              field: lookup_code
-      - name: ppm_source_code
-        tests:
-          - relationships:
-              to: ref('base_erp__pjf_txn_sources_b')
-              field: source_code
-      - name: ppm_document_code
-        tests:
-          - relationships:
-              to: ref('base_erp__pjf_txn_document_b')
-              field: document_code
-      - name: bc_segment_id
-        tests:
-          - relationships:
-              to: ref('base_erp__xcc_budget_accounts')
-              field: bc_segment_id
-      - name: gl_segment_id
-        tests:
-          - relationships:
-              to: ref('base_erp__gl_code_combinations')
-              field: gl_segment_id
-      - name: pjc_project_id
-        tests:
-          - relationships:
-              to: ref('base_erp__pjf_projects_all_b')
-              field: project_id
-      - name: pjc_task_id
-        tests:
-          - relationships:
-              to: ref('base_erp__pjf_proj_elements_b')
-              field: task_id
-      - name: pjc_expenditure_type_id
-        tests:
-          - relationships:
-              to: ref('base_erp__pjf_exp_types_b')
-              field: expenditure_type_id
-      - name: pjc_organization_id
-        tests:
-          - relationships:
-              to: ref('base_erp__hr_all_organization_units_f')
-              field: organization_id
-      - name: vendor_id
-        tests:
-          - relationships:
-              to: ref('base_erp__poz_suppliers')
-              field: vendor_id
-
-  - name: base_erp__xcc_balance_activities_24
-    columns:
-      - name: activity_type_code
-        tests:
-          - relationships:
-              to: ref('base_erp__fnd_lookup_values_tl')
-              field: lookup_code
-      - name: balance_type_code
-        tests:
-          - relationships:
-              to: ref('base_erp__fnd_lookup_values_tl')
-              field: lookup_code
-      - name: balance_subtype_code
-        tests:
-          - relationships:
-              to: ref('base_erp__fnd_lookup_values_tl')
-              field: lookup_code
-      - name: transaction_type_code
-        tests:
-          - relationships:
-              to: ref('base_erp__fnd_lookup_values_tl')
-              field: lookup_code
-      - name: transaction_subtype_code
-        tests:
-          - relationships:
-              to: ref('base_erp__fnd_lookup_values_tl')
-              field: lookup_code
-      - name: transaction_action_code
-        tests:
-          - relationships:
-              to: ref('base_erp__fnd_lookup_values_tl')
-              field: lookup_code
-      - name: destination_type_code
-        tests:
-          - relationships:
-              to: ref('base_erp__fnd_lookup_values_tl')
-              field: lookup_code
-      - name: liquidation_transaction_type_code
-        tests:
-          - relationships:
-              to: ref('base_erp__fnd_lookup_values_tl')
-              field: lookup_code
-      - name: ppm_source_code
-        tests:
-          - relationships:
-              to: ref('base_erp__pjf_txn_sources_b')
-              field: source_code
-      - name: ppm_document_code
-        tests:
-          - relationships:
-              to: ref('base_erp__pjf_txn_document_b')
-              field: document_code
-      - name: bc_segment_id
-        tests:
-          - relationships:
-              to: ref('base_erp__xcc_budget_accounts')
-              field: bc_segment_id
-      - name: gl_segment_id
-        tests:
-          - relationships:
-              to: ref('base_erp__gl_code_combinations')
-              field: gl_segment_id
-      - name: pjc_project_id
-        tests:
-          - relationships:
-              to: ref('base_erp__pjf_projects_all_b')
-              field: project_id
-      - name: pjc_task_id
-        tests:
-          - relationships:
-              to: ref('base_erp__pjf_proj_elements_b')
-              field: task_id
-      - name: pjc_expenditure_type_id
-        tests:
-          - relationships:
-              to: ref('base_erp__pjf_exp_types_b')
-              field: expenditure_type_id
-      - name: pjc_organization_id
-        tests:
-          - relationships:
-              to: ref('base_erp__hr_all_organization_units_f')
-              field: organization_id
-      - name: vendor_id
-        tests:
-          - relationships:
-              to: ref('base_erp__poz_suppliers')
-              field: vendor_id
-
-  - name: base_erp__xcc_budget_accounts
-    columns:
-      - name: bc_segment_id
-        tests:
-          - unique
-          - not_null
-
-  - name: stg_erp__account_group_trees
+  - name: stg_erp__gl_account_categories
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
             - tree_version_name
-            - account_group_code
+            - account_category_code
 
-  - name: stg_erp__account_trees
+  - name: stg_erp__gl_accounts
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
             - tree_version_name
             - account_code
 
-  - name: stg_erp__budget_category_trees
+  - name: stg_erp__gl_budget_categories
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
             - tree_version_name
             - budget_category_code
 
-  - name: stg_erp__budget_situations
-    columns:
-      - name: budget_situation_code
-        tests:
-          - unique
-          - not_null
-
-  - name: stg_erp__cost_center_trees
+  - name: stg_erp__gl_cost_centers
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
             - tree_version_name
             - cost_center_code
 
-  - name: stg_erp__fund_trees
+  - name: stg_erp__gl_funds
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
             - tree_version_name
             - fund_code
+  - name: stg_erp__ppm_actual_costs
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - transaction_number
+            - transaction_line_number
+    columns:
+      - name: task_id
+        tests:
+          - relationships:
+              to: ref('stg_erp__ppm_execution_projects')
+              field: task_id
+      - name: expenditure_type_id
+        tests:
+          - relationships:
+              to: ref('stg_erp__ppm_expenditure_categories')
+              field: expenditure_type_id
+      - name: expenditure_organization_id
+        tests:
+          - relationships:
+              to: ref('stg_erp__ppm_organizations')
+              field: expenditure_organization_id
+      - name: doc_entry_id
+        tests:
+          - relationships:
+              to: ref('stg_erp__ppm_sources')
+              field: doc_entry_id
+      - name: fund_code
+        tests:
+          - relationships:
+              to: ref('stg_erp__gl_funds')
+              field: fund_code
+      - name: cost_center_code
+        tests:
+          - relationships:
+              to: ref('stg_erp__gl_cost_centers')
+              field: cost_center_code
+      - name: account_code
+        tests:
+          - relationships:
+              to: ref('stg_erp__gl_accounts')
+              field: account_code
+      - name: budget_category_code
+        tests:
+          - relationships:
+              to: ref('stg_erp__gl_budget_categories')
+              field: budget_category_code
+      - name: vendor_id
+        tests:
+          - relationships:
+              to: ref('stg_erp__prc_suppliers')
+              field: vendor_id
+
+  - name: stg_erp__ppm_budget_situations
+    columns:
+      - name: budget_situation_code
+        tests:
+          - not_null
+          - unique
+
+  - name: stg_erp__ppm_committed_costs
+    columns:
+      - name: transaction_number
+        tests:
+          - not_null
+          - unique
+      - name: task_id
+        tests:
+          - relationships:
+              to: ref('stg_erp__ppm_execution_projects')
+              field: task_id
+      - name: expenditure_type_id
+        tests:
+          - relationships:
+              to: ref('stg_erp__ppm_expenditure_categories')
+              field: expenditure_type_id
+      - name: expenditure_organization_id
+        tests:
+          - relationships:
+              to: ref('stg_erp__ppm_organizations')
+              field: expenditure_organization_id
+      - name: doc_entry_id
+        tests:
+          - relationships:
+              to: ref('stg_erp__ppm_sources')
+              field: doc_entry_id
+      - name: fund_code
+        tests:
+          - relationships:
+              to: ref('stg_erp__gl_funds')
+              field: fund_code
+      - name: cost_center_code
+        tests:
+          - relationships:
+              to: ref('stg_erp__gl_cost_centers')
+              field: cost_center_code
+      - name: account_code
+        tests:
+          - relationships:
+              to: ref('stg_erp__gl_accounts')
+              field: account_code
+      - name: budget_category_code
+        tests:
+          - relationships:
+              to: ref('stg_erp__gl_budget_categories')
+              field: budget_category_code
+      - name: vendor_id
+        tests:
+          - relationships:
+              to: ref('stg_erp__prc_suppliers')
+              field: vendor_id
+
+  - name: stg_erp__ppm_execution_projects
+    columns:
+      - name: task_id
+        tests:
+          - not_null
+          - unique
+      - name: fund_code
+        tests:
+          - relationships:
+              to: ref('stg_erp__gl_funds')
+              field: fund_code
+      - name: budget_category_group_code
+        tests:
+          - relationships:
+              to: ref('stg_erp__gl_budget_categories')
+              field: budget_category_group_code
+      - name: budget_situation_code
+        tests:
+          - relationships:
+              to: ref('stg_erp__ppm_budget_situations')
+              field: budget_situation_code
+
+  - name: stg_erp__ppm_expenditure_categories
+    columns:
+      - name: expenditure_type_id
+        tests:
+          - not_null
+          - unique
+
+  - name: stg_erp__ppm_organizations
+    columns:
+      - name: expenditure_organization_id
+        tests:
+          - not_null
+          - unique
+
+  - name: stg_erp__ppm_sources
+    columns:
+      - name: doc_entry_id
+        tests:
+          - not_null
+          - unique
+
+  - name: stg_erp__prc_suppliers
+    columns:
+      - name: vendor_id
+        tests:
+          - not_null
+          - unique

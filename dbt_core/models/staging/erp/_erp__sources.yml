@@ -5,19 +5,18 @@ sources:
     database: fusion
     schema: erp
     tables:
-      - name: FND_LOOKUP_VALUES_TL
-      - name: FND_VS_VALUES_B
-      - name: GL_CODE_COMBINATIONS
-      - name: GL_SEG_VAL_HIER_CF
-      - name: HR_ALL_ORGANIZATION_UNITS_F
-      - name: PJF_EXP_CATEGORIES_TL
-      - name: PJF_EXP_TYPES_B
-      - name: PJF_PROJ_ELEMENTS_B
-      - name: PJF_PROJECTS_ALL_B
-      - name: PJF_TXN_DOCUMENT_B
-      - name: PJF_TXN_SOURCES_B
-      - name: POZ_SUPPLIERS
-      - name: XCC_BALANCE_ACTIVITIES_22
-      - name: XCC_BALANCE_ACTIVITIES_23
-      - name: XCC_BALANCE_ACTIVITIES_24
-      - name: XCC_BUDGET_ACCOUNTS
+      - name: bc_budget_targets
+      - name: gl_account_categories
+      - name: gl_accounts
+      - name: gl_budget_categories
+      - name: gl_cost_centers
+      - name: gl_funds
+      - name: ppm_actual_costs_23
+      - name: ppm_actual_costs_24
+      - name: ppm_budget_situations
+      - name: ppm_committed_costs
+      - name: ppm_expenditure_categories
+      - name: ppm_organizations
+      - name: ppm_projects
+      - name: ppm_sources
+      - name: prc_suppliers
