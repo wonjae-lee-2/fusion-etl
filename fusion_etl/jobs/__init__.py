@@ -2,7 +2,7 @@ from dagster import AssetSelection, RunConfig, define_asset_job, job
 
 from ..ops import send_slack_message
 
-MAX_CONCURENT_OPS = 11
+MAX_CONCURENT_OPS = 4
 
 der_job = define_asset_job(
     "der_job",
