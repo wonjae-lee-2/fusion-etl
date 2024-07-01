@@ -1,6 +1,6 @@
 with
 
-apportioned_budget_lines as (
+budget_lines as (
 
     select
         apportioned_budget_line_id,
@@ -8,12 +8,12 @@ apportioned_budget_lines as (
         abc_code,
         strategy_code,
         budget_version,
+        strategy_validity_key,
         scenario,
-        cost_center,
-        budget_category,
+        cost_center_code,
+        budget_category_group_code,
         output_statement_id,
-        usd_amount,
-        strategy_validity_key
+        usd_amount
 
     from {{ ref('base_rdp__apportioned_budget_lines') }}
 ),
@@ -26,36 +26,34 @@ strategy_validities as (
 
 ),
 
-output_statement_validities as (
+output_validities as (
 
     select distinct output_statement_id
 
     from {{ ref('base_rdp__output_statement_validities') }}
 
-    where is_excluded = 0
-
 )
 
 select
-    apportioned_budget_lines.apportioned_budget_line_id,
-    apportioned_budget_lines.budget_year,
-    apportioned_budget_lines.abc_code,
-    apportioned_budget_lines.strategy_code,
-    apportioned_budget_lines.budget_version,
-    apportioned_budget_lines.scenario,
-    apportioned_budget_lines.cost_center,
-    apportioned_budget_lines.budget_category,
-    apportioned_budget_lines.output_statement_id,
-    apportioned_budget_lines.usd_amount
+    budget_lines.apportioned_budget_line_id,
+    budget_lines.budget_year,
+    budget_lines.abc_code,
+    budget_lines.strategy_code,
+    budget_lines.budget_version,
+    budget_lines.scenario,
+    budget_lines.cost_center_code,
+    budget_lines.budget_category_group_code,
+    budget_lines.output_statement_id,
+    budget_lines.usd_amount
 
-from apportioned_budget_lines
+from budget_lines
 
 inner join strategy_validities
     on
-        apportioned_budget_lines.strategy_validity_key
+        budget_lines.strategy_validity_key
         = strategy_validities.strategy_validity_key
 
-inner join output_statement_validities
+inner join output_validities
     on
-        apportioned_budget_lines.output_statement_id
-        = output_statement_validities.output_statement_id
+        budget_lines.output_statement_id
+        = output_validities.output_statement_id

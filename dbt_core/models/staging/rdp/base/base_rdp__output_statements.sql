@@ -2,20 +2,21 @@ with
 
 source as (
 
-    select * from {{ source('rdp', 'OutputStatement') }}
+    select
+        outputstatementguid as output_statement_id,
+        outputstatement as output_statement_short_code,
+        outputstatementcode as output_statement_long_code,
+        outputstatementshortdescr as output_statement,
+        outputstatementlongdescr as output_statement_description,
+        pillar as population_group,
+        situationcode as budget_situation_code,
+        outcomestatementguid as outcome_statement_id
+
+    from {{ source('rdp', 'OutputStatement') }}
+
+    where isdeleted = 0
+
 
 )
 
-select
-    outputstatementguid as output_statement_id,
-    outputstatement as output_statement,
-    outputstatementcode as output_statement_code,
-    outputstatementshortdescr as output_statement_short_descr,
-    outputstatementlongdescr as output_statement_long_descr,
-    pillar,
-    outcomestatementguid as outcome_statement_id,
-    concat(pillar, situationcode) as situation_code
-
-from source
-
-where isdeleted = 0
+select * from source

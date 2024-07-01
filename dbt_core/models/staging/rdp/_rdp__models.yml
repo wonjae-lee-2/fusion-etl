@@ -1,17 +1,46 @@
 version: 2
 
 models:
-  - name: base_rdp__output_statements
+  - name: base_rdp__apportioned_budget_lines
     columns:
-      - name: output_statement_id
+      - name: apportioned_budget_line_id
         tests:
           - unique
           - not_null
-      - name: outcome_statement_id
+
+  - name: base_rdp__impact_areas
+    columns:
+      - name: impact_area_id
+        tests:
+          - unique
+          - not_null
+
+  - name: base_rdp__impact_statements
+    columns:
+      - name: impact_statement_id
+        tests:
+          - unique
+          - not_null
+      - name: impact_area_id
         tests:
           - relationships:
-              to: ref('base_rdp__outcome_statements')
-              field: outcome_statement_id
+              to: ref('base_rdp__impact_areas')
+              field: impact_area_id
+
+  - name: base_rdp__ops_budget_lines
+    columns:
+      - name: ops_budget_line_id
+        tests:
+          - unique
+          - not_null
+
+  - name: base_rdp__outcome_areas
+    columns:
+      - name: outcome_area_id
+        tests:
+          - unique
+          - not_null
+
   - name: base_rdp__outcome_statements
     columns:
       - name: outcome_statement_id
@@ -28,41 +57,26 @@ models:
           - relationships:
               to: ref('base_rdp__impact_statements')
               field: impact_statement_id
-  - name: base_rdp__outcome_areas
+
+  - name: base_rdp__output_statements
     columns:
-      - name: outcome_area_id
+      - name: output_statement_id
         tests:
           - unique
           - not_null
-  - name: base_rdp__impact_statements
-    columns:
-      - name: impact_statement_id
-        tests:
-          - unique
-          - not_null
-      - name: impact_area_id
+      - name: outcome_statement_id
         tests:
           - relationships:
-              to: ref('base_rdp__impact_areas')
-              field: impact_area_id
-  - name: base_rdp__impact_areas
+              to: ref('base_rdp__outcome_statements')
+              field: outcome_statement_id
+
+  - name: base_rdp__output_statement_validities
     columns:
-      - name: impact_area_id
+      - name: output_statement_validity_id
         tests:
           - unique
           - not_null
-  - name: base_rdp__ops_budget_lines
-    columns:
-      - name: ops_budget_line_id
-        tests:
-          - unique
-          - not_null
-  - name: base_rdp__apportioned_budget_lines
-    columns:
-      - name: apportioned_budget_line_id
-        tests:
-          - unique
-          - not_null
+
   - name: base_rdp__strategy_validities
     columns:
       - name: strategy_validity_id
@@ -73,20 +87,16 @@ models:
         tests:
           - unique
           - not_null
-  - name: base_rdp__output_statement_validities
-    columns:
-      - name: output_statement_validity_id
-        tests:
-          - unique
-          - not_null
-  - name: stg_rdp__ops_budget_lines
+
+  - name: stg_rdp__apportioned_budget_lines
     columns:
       - name: output_statement_id
         tests:
           - relationships:
               to: ref('stg_rdp__results_areas')
               field: output_statement_id
-  - name: stg_rdp__apportioned_budget_lines
+
+  - name: stg_rdp__ops_budget_lines
     columns:
       - name: output_statement_id
         tests:
