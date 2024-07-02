@@ -71,3 +71,7 @@ This table's RATE_DIV column has several 0E-8 which bulk insert cannot handle. Y
 ### BI Publisher jobs
 
 Some erp assets are split into one calendar year to reduce the number of rows returned. For those assets, you need to schedule reports with a job name that corresponds to the 'source' property in ERP_MAPPINGS. If not, the erp timestamp sensor cannot find the job.
+
+### Password change
+
+When you change the password, don't forget to update .env as well as github secrets.
