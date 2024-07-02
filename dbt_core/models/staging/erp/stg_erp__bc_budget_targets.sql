@@ -14,7 +14,7 @@ source as (
         segment4 as original_budget_category_group_code,
         attribute_char5 as goal,
         attribute_char4 as population_group,
-        attribute_char3 as budget_situation_code,
+        attribute_char3 as original_budget_situation_code,
         budget_action,
         attribute_char1 as budget_classification_type,
         attribute_char2 as budget_change_type,
@@ -25,8 +25,13 @@ source as (
         case segment4
             when 'PG' then 'STAFF'
             when 'PS' then 'STAFF'
+            when 'AO' then 'ABOD'
             else segment4
-        end as budget_category_group_code
+        end as budget_category_group_code,
+        case attribute_char3
+            when '1900' then '900'
+            else attribute_char3
+        end as budget_situation_code
 
     from {{ source('erp', 'bc_budget_targets') }}
 
@@ -46,6 +51,7 @@ select
     goal,
     population_group,
     budget_situation_code,
+    original_budget_situation_code,
     budget_action,
     budget_classification_type,
     budget_change_type,
