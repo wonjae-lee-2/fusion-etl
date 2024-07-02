@@ -42,6 +42,12 @@ models:
           combination_of_columns:
             - tree_version_name
             - account_code
+    columns:
+      - name: account_category_code
+        tests:
+          - relationships:
+              to: ref('stg_erp__gl_account_categories')
+              field: account_category_code
 
   - name: stg_erp__gl_budget_categories
     tests:
@@ -221,6 +227,10 @@ models:
   - name: stg_erp__prc_suppliers
     columns:
       - name: vendor_id
+        tests:
+          - not_null
+          - unique
+      - name: supplier_number
         tests:
           - not_null
           - unique
