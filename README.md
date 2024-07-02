@@ -74,4 +74,4 @@ Some erp assets are split into one calendar year to reduce the number of rows re
 
 ### Password change
 
-When you change the password, don't forget to update .env as well as github secrets.
+When you change the password, don't forget to update .env, azure profile and token as well as github secrets.
