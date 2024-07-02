@@ -1,7 +1,7 @@
 ERP_MAPPINGS = [
     {
         "name": "bc_budget_targets",
-        "status": "inactive",
+        "status": "active",
         "source": "bc_budget_targets",
         "target": "[erp].[bc_budget_targets]",
     },
