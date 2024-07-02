@@ -6,7 +6,7 @@ source as (
         timestamp_utc,
         header_id,
         line_number,
-        creation_date as budget_entry_date,
+        cast(creation_date as date) as budget_entry_date,
         period_name as budget_period,
         source_budget as control_budget,
         segment1 as fund_code,

@@ -69,6 +69,7 @@ models:
           combination_of_columns:
             - tree_version_name
             - fund_code
+
   - name: stg_erp__ppm_actual_costs
     tests:
       - dbt_utils.unique_combination_of_columns:
@@ -197,6 +198,16 @@ models:
           - relationships:
               to: ref('stg_erp__gl_budget_categories')
               field: budget_category_group_code
+      - name: impact_area
+        tests:
+          - relationships:
+              to: ref('stg_rdp__impact_areas')
+              field: impact_area
+      - name: outcome_area
+        tests:
+          - relationships:
+              to: ref('stg_rdp__outcome_areas')
+              field: outcome_area
       - name: budget_situation_code
         tests:
           - relationships:
@@ -213,6 +224,10 @@ models:
   - name: stg_erp__ppm_organizations
     columns:
       - name: expenditure_organization_id
+        tests:
+          - not_null
+          - unique
+      - name: expenditure_organization
         tests:
           - not_null
           - unique

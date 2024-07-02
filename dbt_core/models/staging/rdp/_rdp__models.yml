@@ -5,22 +5,22 @@ models:
     columns:
       - name: apportioned_budget_line_id
         tests:
-          - unique
           - not_null
+          - unique
 
   - name: base_rdp__impact_areas
     columns:
       - name: impact_area_id
         tests:
-          - unique
           - not_null
+          - unique
 
   - name: base_rdp__impact_statements
     columns:
       - name: impact_statement_id
         tests:
-          - unique
           - not_null
+          - unique
       - name: impact_area_id
         tests:
           - relationships:
@@ -31,22 +31,22 @@ models:
     columns:
       - name: ops_budget_line_id
         tests:
-          - unique
           - not_null
+          - unique
 
   - name: base_rdp__outcome_areas
     columns:
       - name: outcome_area_id
         tests:
-          - unique
           - not_null
+          - unique
 
   - name: base_rdp__outcome_statements
     columns:
       - name: outcome_statement_id
         tests:
-          - unique
           - not_null
+          - unique
       - name: outcome_area_id
         tests:
           - relationships:
@@ -62,8 +62,8 @@ models:
     columns:
       - name: output_statement_id
         tests:
-          - unique
           - not_null
+          - unique
       - name: outcome_statement_id
         tests:
           - relationships:
@@ -74,32 +74,78 @@ models:
     columns:
       - name: output_statement_validity_id
         tests:
-          - unique
           - not_null
+          - unique
+      - name: output_statement_id
+        tests:
+          - relationships:
+              to: ref('base_rdp__output_statements')
+              field: output_statement_id
 
   - name: base_rdp__strategy_validities
     columns:
       - name: strategy_validity_id
         tests:
-          - unique
           - not_null
+          - unique
       - name: strategy_validity_key
         tests:
-          - unique
           - not_null
+          - unique
 
-  - name: stg_rdp__apportioned_budget_lines
+  - name: stg_rdp__budget_details
     columns:
-      - name: output_statement_id
+      - name: fund_code
         tests:
           - relationships:
-              to: ref('stg_rdp__results_areas')
-              field: output_statement_id
-
-  - name: stg_rdp__ops_budget_lines
-    columns:
-      - name: output_statement_id
+              to: ref('stg_erp__gl_funds')
+              field: fund_code
+      - name: cost_center_code
         tests:
           - relationships:
-              to: ref('stg_rdp__results_areas')
-              field: output_statement_id
+              to: ref('stg_erp__gl_cost_centers')
+              field: cost_center_code
+      - name: budget_category_group_code
+        tests:
+          - relationships:
+              to: ref('stg_erp__gl_budget_categories')
+              field: budget_category_group_code
+      - name: expenditure_organization
+        tests:
+          - relationships:
+              to: ref('stg_erp__ppm_organizations')
+              field: expenditure_organization
+      - name: impact_area
+        tests:
+          - relationships:
+              to: ref('stg_rdp__impact_areas')
+              field: impact_area
+      - name: outcome_area
+        tests:
+          - relationships:
+              to: ref('stg_rdp__outcome_areas')
+              field: outcome_area
+      - name: budget_situation_code
+        tests:
+          - relationships:
+              to: ref('stg_erp__ppm_budget_situations')
+              field: budget_situation_code
+      - name: supplier_number
+        tests:
+          - relationships:
+              to: ref('stg_erp__prc_suppliers')
+              field: supplier_number
+
+  - name: stg_rdp__impact_areas
+    columns:
+      - name: impact_area
+        tests:
+          - not_null
+          - unique
+
+  - name: stg_rdp__outcome_areas
+    columns:
+      - name: outcome_area
+        tests:
+          - not_null
+          - unique
